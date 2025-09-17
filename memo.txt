@@ -1,11 +1,15 @@
-Terminal avec brew :
+--- Terminal avec brew ---
 
-Arrêter :
+-- Arrêter (Pour mac)--
 
 brew services stop mongodb/brew/mongodb-community@7.0
 
-Relancer :
+-- Relancer (Pour mac)--
 
 brew services start mongodb/brew/mongodb-community@7.0
 
-Vérifier brew services list pour savoir si ça tourne.
+-- Vérifier si ça tourne --
+
+brew services list
+
+uvicorn app.main:app --reload

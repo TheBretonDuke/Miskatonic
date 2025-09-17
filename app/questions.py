@@ -5,22 +5,27 @@
 # ============================================================
 
 from fastapi import APIRouter
-from app.database import questions_collection  # connexion Mongo
+from app.database import questions_collection
 
-# Création du routeur pour les questions
 router = APIRouter()
 
 @router.get("/")
 def get_questions(limit: int = 5):
     """
-    Récupère les X premières questions depuis MongoDB.
+    Récupère aléatoirement X questions depuis MongoDB.
     - limit : nombre de questions à renvoyer (par défaut 5)
     """
-    # Lecture dans MongoDB
-    questions = list(questions_collection.find().limit(limit))
-    
-    # Conversion de l'_id Mongo en string (sinon JSON ne comprend pas)
-    for q in questions:
-        q["_id"] = str(q["_id"])
-    
+    docs = questions_collection.aggregate([{"$sample": {"size": limit}}])
+
+    questions = []
+    for q in docs:
+        questions.append({
+            "id": str(q["_id"]),
+            "question": q["question"],
+            "choix": q["choix"],
+            "correct": q["bonnes_reponses"],  # toujours une liste
+            "theme": q["theme"],
+            "niveau": q["niveau"]
+        })
+
     return questions
