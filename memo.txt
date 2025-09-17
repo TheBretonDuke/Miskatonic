@@ -1,0 +1,11 @@
+Terminal avec brew :
+
+Arrêter :
+
+brew services stop mongodb/brew/mongodb-community@7.0
+
+Relancer :
+
+brew services start mongodb/brew/mongodb-community@7.0
+
+Vérifier brew services list pour savoir si ça tourne.

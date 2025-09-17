@@ -1,0 +1,24 @@
+# Environnements virtuels
+venv/
+.venv/
+env/
+.venvquiz/
+venvquiz/
+
+# Caches Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configs locales
+*.DS_Store
+*.vscode/
+*.idea/
+
+# Bases locales (si tu veux les recréer via ETL au lieu de les versionner)
+data/users.db
+data/*.sqlite
+
+# Fichiers de sortie (cartes, backups, etc.)
+output/

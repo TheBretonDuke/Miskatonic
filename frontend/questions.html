@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Questions du Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #2c3e50; }
+    .question { 
+      margin-bottom: 15px; 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      border-radius: 6px; 
+      background: #f9f9f9;
+    }
+    .theme { font-size: 0.9em; color: gray; }
+  </style>
+</head>
+<body>
+  <h1>Liste des Questions</h1>
+  <div id="questions">Chargement...</div>
+
+  <script>
+    // Appel API vers FastAPI
+    fetch("http://127.0.0.1:8000/questions?limit=5")
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById("questions");
+        container.innerHTML = ""; // reset
+        data.forEach(q => {
+          const div = document.createElement("div");
+          div.className = "question";
+          div.innerHTML = `
+            <strong>${q.question}</strong><br>
+            <span class="theme">Thème : ${q.theme} | Niveau : ${q.niveau}</span>
+            <ul>
+              ${q.choix.map(rep => `<li>${rep}</li>`).join("")}
+            </ul>
+          `;
+          container.appendChild(div);
+        });
+      })
+      .catch(err => {
+        document.getElementById("questions").innerText = "Erreur lors du chargement.";
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
