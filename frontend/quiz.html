@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz - Terre du Milieu</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts (fantasy style) -->
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: url('https://www.transparenttextures.com/patterns/parchment.png');
+      font-family: 'MedievalSharp', cursive;
+      color: #2c1810;
+    }
+    h1 {
+      color: #bfa14a;
+      text-shadow: 2px 2px #000;
+    }
+    .card {
+      background-color: #fdf6e3;
+      border: 2px solid #bfa14a;
+      border-radius: 12px;
+    }
+    .form-check-label {
+      font-weight: bold;
+    }
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+    .wrong {
+      color: red;
+      font-weight: bold;
+    }
+    .btn-validate {
+      background-color: #e0c97f;
+      border: 1px solid #5a381e;
+      color: #2c1810;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    .btn-validate:hover {
+      background-color: #bfa14a;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">⚔️ Quiz de la Terre du Milieu</h1>
+    <div id="quiz" class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-body" id="quiz-body">
+            <p class="text-center">Chargement des questions...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let questions = [];
+    let current = 0;
+    let score = 0;
+
+    function showQuestion() {
+      const q = questions[current];
+      const body = document.getElementById("quiz-body");
+
+      body.innerHTML = `
+        <h5 class="card-title">${q.question}</h5>
+        <p><em>Thème : ${q.theme} | Niveau : ${q.niveau}</em></p>
+        <form id="quiz-form"></form>
+        <button type="button" class="btn btn-validate" onclick="submitAnswer()">Valider</button>
+      `;
+
+      const form = document.getElementById("quiz-form");
+      q.choix.forEach(rep => {
+        const div = document.createElement("div");
+        div.className = "form-check";
+        div.innerHTML = `
+          <input class="form-check-input" type="checkbox" value="${rep}" id="${rep}">
+          <label class="form-check-label" for="${rep}">${rep}</label>
+        `;
+        form.appendChild(div);
+      });
+    }
+
+    function submitAnswer() {
+      const q = questions[current];
+      const selected = Array.from(document.querySelectorAll("input:checked")).map(cb => cb.value);
+      const correct = q.correct;
+
+      // Vérification (QCU ou QCM)
+      const isCorrect = correct.length === selected.length &&
+                        correct.every(r => selected.includes(r));
+
+      if (isCorrect) {
+        score++;
+      }
+
+      // Coloration des réponses
+      document.querySelectorAll("input").forEach(cb => {
+        const label = cb.nextElementSibling;
+        if (correct.includes(cb.value)) {
+          label.classList.add("correct");
+        } else if (cb.checked) {
+          label.classList.add("wrong");
+        }
+        cb.disabled = true;
+      });
+
+      // Bouton "Suivant" au lieu de "Valider"
+      const body = document.getElementById("quiz-body");
+      body.innerHTML += `
+        <button type="button" class="btn btn-dark mt-3 w-100" onclick="nextQuestion()">Suivant</button>
+      `;
+      document.querySelector(".btn-validate").remove();
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      document.getElementById("quiz-body").innerHTML = `
+        <h4 class="text-center">🏆 Fin du Quiz !</h4>
+        <p class="text-center">Votre score : ${score} / ${questions.length}</p>
+      `;
+    }
+
+    // Charger les questions depuis l’API (note le / final)
+    fetch("http://127.0.0.1:8000/questions/?limit=5")
+      .then(res => res.json())
+      .then(data => {
+        questions = data;
+        current = 0;
+        score = 0;
+        showQuestion();
+      })
+      .catch(err => {
+        document.getElementById("quiz-body").innerHTML =
+          `<div class="alert alert-danger">Erreur lors du chargement du quiz.</div>`;
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
