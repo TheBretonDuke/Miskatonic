@@ -1,0 +1,11 @@
+# === Backend API ===
+fastapi==0.115.5
+uvicorn==0.32.1
+
+# === Base de données ===
+pymongo==4.15.1   # connexion MongoDB
+pandas==2.3.2     # ETL CSV → MongoDB
+bcrypt==4.2.0     # hash mots de passe (SQLite)
+
+# === Utilitaires ===
+python-dotenv==1.0.1   # (optionnel) gérer des variables d'environnement

@@ -1,15 +1,65 @@
---- Terminal avec brew ---
+===============================
+Mémo - Lancer le projet Quiz
+===============================
 
--- Arrêter (Pour mac)--
+--- MongoDB (Docker) ---
 
-brew services stop mongodb/brew/mongodb-community@7.0
+# Lancer MongoDB dans un conteneur (si pas déjà créé)
+docker run -d \
+  --name mongodb_quiz \
+  -p 27017:27017 \
+  -v ~/data/mongodb:/data/db \
+  mongo:7
 
--- Relancer (Pour mac)--
+# Vérifier si le conteneur tourne
+docker ps
 
-brew services start mongodb/brew/mongodb-community@7.0
+# Arrêter MongoDB
+docker stop mongodb_quiz
 
--- Vérifier si ça tourne --
+# Relancer MongoDB
+docker start mongodb_quiz
 
-brew services list
+# Voir les logs (optionnel, debug)
+docker logs mongodb_quiz
 
+
+--- Base de données utilisateurs (SQLite) ---
+
+# La base est dans :
+data/users.db
+
+# Si besoin, recréer la table
+# (c’est automatique via init_db() dans app/database.py)
+
+
+--- API FastAPI (backend Python) ---
+
+# Activer l'environnement virtuel
+source .venvquiz/bin/activate
+
+# Lancer le serveur (port 8000 par défaut)
 uvicorn app.main:app --reload
+
+# Tester dans le navigateur :
+http://127.0.0.1:8000/docs    (interface Swagger/OpenAPI)
+http://127.0.0.1:8000/questions?limit=5
+
+
+--- Frontend (HTML) ---
+
+# Fichiers statiques dans le dossier frontend/
+frontend/index.html
+frontend/questions.html
+frontend/quiz.html
+
+# Ouvrir dans un navigateur (double-clic ou `open`)
+open frontend/questions.html
+open frontend/quiz.html
+
+--- Pour kill un port ---
+lsof -i :8000
+
+kill -9 <PID>
+Relancer uvicorn avecuvicorn app.main:app --reload
+

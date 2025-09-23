@@ -1,0 +1,141 @@
+/* === STYLE MÉDIÉVAL - Miskatonic Quiz === */
+
+/* Fond général */
+body {
+  font-family: 'MedievalSharp', cursive;
+  background: url("https://www.transparenttextures.com/patterns/aged-paper.png") repeat;
+  background-color: #f5f0e1;
+  color: #2c1b10;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(90deg, #4a2c2a, #2c1b10);
+  border-bottom: 4px solid #d4af37; /* Or */
+}
+
+.navbar .brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #d4af37; /* Doré */
+  text-shadow: 1px 1px 3px #000;
+}
+
+/* Cartes */
+.card {
+  background: #fdf6e3;
+  border: 2px solid #d4af37; /* Or */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+  margin-bottom: 20px;
+}
+
+.card h2, .card h5 {
+  color: #4a2c2a;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 2px #d4af37;
+}
+
+/* Texte secondaire */
+.small-muted {
+  font-size: 0.85rem;
+  color: #5c4634;
+  font-style: italic;
+}
+
+/* Boutons */
+.btn {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1rem;
+  border: 2px solid #2c1b10;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #2c1b10; /* Marron foncé */
+  border-color: #d4af37;
+  color: #d4af37;
+}
+
+.btn-primary:hover {
+  background-color: #d4af37;
+  border-color: #2c1b10;
+  color: #2c1b10;
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  border-color: #2c1b10;
+  color: #2c1b10;
+}
+
+.btn-outline-primary:hover {
+  background-color: #d4af37;
+  color: #2c1b10;
+}
+
+.btn-danger {
+  background-color: #7a1f1f;
+  border-color: #2c1b10;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #2c1b10;
+  color: #d4af37;
+}
+
+/* Quiz - Réponses */
+.choice-label {
+  font-size: 1rem;
+  padding: 4px;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fdfdfb;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.choice-label:hover {
+  background: #f5e1a4;
+}
+
+/* Réponses correctes et fausses */
+.correct {
+  background-color: #c8e6c9 !important;
+  border-color: #2e7d32 !important;
+  font-weight: bold;
+}
+
+.wrong {
+  background-color: #ffcdd2 !important;
+  border-color: #c62828 !important;
+  font-weight: bold;
+}
+
+/* Résultats */
+#quiz-body h4 {
+  color: #4a2c2a;
+  text-shadow: 1px 1px 2px #d4af37;
+}
+
+/* Animations */
+.card, .btn, .choice-label {
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.01);
+}
+
+.btn:hover, .choice-label:hover {
+  transform: scale(1.02);
+}

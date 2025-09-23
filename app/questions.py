@@ -1,31 +1,35 @@
 # ============================================================
-# app/questions.py
-#
-# Routes pour interagir avec les questions (MongoDB)
+# questions.py - Récupération des questions depuis MongoDB
 # ============================================================
 
-from fastapi import APIRouter
-from app.database import questions_collection
+from pymongo import MongoClient
+import os
 
-router = APIRouter()
+# Connexion Mongo (via variable d'environnement si dispo)
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017/")
+client = MongoClient(MONGO_URL)
 
-@router.get("/")
+# Sélection de la base et de la collection
+db = client.quizdb
+collection = db.questions
+
 def get_questions(limit: int = 5):
     """
-    Récupère aléatoirement X questions depuis MongoDB.
-    - limit : nombre de questions à renvoyer (par défaut 5)
+    Récupère les questions depuis MongoDB.
+    Retourne une liste de dictionnaires compatibles avec le front.
     """
-    docs = questions_collection.aggregate([{"$sample": {"size": limit}}])
-
+    cursor = collection.find().limit(limit)
     questions = []
-    for q in docs:
-        questions.append({
-            "id": str(q["_id"]),
-            "question": q["question"],
-            "choix": q["choix"],
-            "correct": q["bonnes_reponses"],  # toujours une liste
-            "theme": q["theme"],
-            "niveau": q["niveau"]
-        })
+
+    for doc in cursor:
+        # On force les clés attendues par le front
+        q = {
+            "question": doc.get("question", ""),
+            "theme": doc.get("theme", "Général"),
+            "niveau": doc.get("niveau", "Facile"),
+            "choix": doc.get("choix", []),
+            "correct": doc.get("correct", [])
+        }
+        questions.append(q)
 
     return questions

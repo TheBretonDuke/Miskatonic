@@ -1,83 +1,68 @@
-# ============================================================
-# database.py
-#
-# Ce fichier centralise toutes les connexions aux bases de données :
-#   - SQLite : pour gérer les utilisateurs (authentification, rôles)
-#   - MongoDB : pour gérer les questions du quiz
-#
-# FastAPI utilisera ce fichier pour accéder aux deux bases.
-# ============================================================
+import sqlite3
+from app.users_passwords import hash_password, verify_password
 
-# =============================
-# --- Partie 1 : SQLite (SQL) ---
-# =============================
+DB_PATH = "data/users.db"
 
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+# --- Création de la table users avec rôles ---
+def init_db():
+    """Initialise la base SQLite (crée la table users si elle n'existe pas)."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL CHECK(role IN ('prof', 'admin', 'eleve')) DEFAULT 'prof'
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# URL de connexion vers SQLite
-# -----------------------------
-# "./data/users.db" = fichier de base de données SQLite
-# "sqlite:///" = préfixe de connexion pour SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite:///./data/users.db"
+# --- Création utilisateur ---
+def create_user(username: str, password: str, role: str = "prof") -> bool:
+    """
+    Ajoute un utilisateur en SQLite.
+    Retourne False si l'utilisateur existe déjà.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
 
-# Création du moteur SQLAlchemy
-# -----------------------------
-# - connect_args={"check_same_thread": False} est nécessaire pour SQLite
-#   car par défaut SQLite n'autorise pas l'accès multi-thread
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+    # Vérifier si le username existe déjà
+    cur.execute("SELECT * FROM users WHERE username=?", (username,))
+    if cur.fetchone():
+        conn.close()
+        return False
 
-# Création d'une "Session" pour interagir avec la base
-# ----------------------------------------------------
-# - autocommit=False → il faut valider les transactions avec commit()
-# - autoflush=False → évite que les requêtes partent trop tôt
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    # Hash du mot de passe
+    hashed = hash_password(password)
 
-# Base de référence pour déclarer les modèles SQLAlchemy
-# ------------------------------------------------------
-# Exemple : un modèle User héritera de Base
-Base = declarative_base()
+    # Insertion du nouvel utilisateur avec rôle
+    cur.execute(
+        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+        (username, hashed, role)
+    )
+    conn.commit()
+    conn.close()
+    return True
 
+# --- Authentification ---
+def authenticate_user(username: str, password: str) -> tuple[bool, str | None]:
+    """
+    Vérifie si le couple username/password est correct.
+    Retourne (True, role) si ok, sinon (False, None).
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
 
-# =============================
-# --- Partie 2 : MongoDB (NoSQL) ---
-# =============================
+    cur.execute("SELECT password, role FROM users WHERE username=?", (username,))
+    row = cur.fetchone()
+    conn.close()
 
-from pymongo import MongoClient
+    if not row:
+        return False, None
 
-# Connexion au serveur MongoDB local
-# ----------------------------------
-# "mongodb://localhost:27017/" = URL par défaut
-mongo_client = MongoClient("mongodb://localhost:27017/")
-
-# Sélection de la base MongoDB
-# ----------------------------
-# Elle sera créée automatiquement si elle n'existe pas encore
-mongo_db = mongo_client.quizdb
-
-# Sélection de la collection "questions"
-# --------------------------------------
-# Comme une "table" en SQL, mais flexible
-questions_collection = mongo_db.questions
-
-
-# =============================
-# --- Partie 3 : Dépendance FastAPI ---
-# =============================
-
-# Cette fonction permet à FastAPI de récupérer une session SQLite
-# Elle sera utilisée avec "Depends" dans les routes
-# Exemple :
-#   def ma_route(db: Session = Depends(get_db)):
-#       ...
-def get_db():
-    # Ouverture d'une session
-    db = SessionLocal()
-    try:
-        yield db   # on fournit la session à la route FastAPI
-    finally:
-        db.close() # fermeture après usage
+    stored_password, role = row
+    if verify_password(password, stored_password):
+        return True, role
+    return False, None
