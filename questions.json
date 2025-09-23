@@ -1,0 +1,970 @@
+[
+  {
+    "question":"Que signifie le sigle No-SQL ?",
+    "subject":"BDD",
+    "use":"Test de positionnement",
+    "correct":[
+      "Pas seulement SQL"
+    ],
+    "responses":[
+      "Pas seulement SQL",
+      "Pas de SQL",
+      "Pas tout SQL"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Cassandra et HBase sont des bases de données",
+    "subject":"BDD",
+    "use":"Test de positionnement",
+    "correct":[
+      "orientées colonne"
+    ],
+    "responses":[
+      "relationnelles",
+      "orientées objet",
+      "orientées colonne",
+      "orientées graphe"
+    ],
+    "remark":null
+  },
+  {
+    "question":"MongoDB et CouchDB sont des bases de données",
+    "subject":"BDD",
+    "use":"Test de positionnement",
+    "correct":[
+      "orientées objet"
+    ],
+    "responses":[
+      "relationnelles",
+      "orientées objet",
+      "orientées colonne",
+      "orientées graphe"
+    ],
+    "remark":null
+  },
+  {
+    "question":"OrientDB et Neo4J sont des bases de données",
+    "subject":"BDD",
+    "use":"Test de positionnement",
+    "correct":[
+      "orientées graphe"
+    ],
+    "responses":[
+      "relationnelles",
+      "orientées objet",
+      "orientées colonne",
+      "orientées graphe"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pour indexer des données textuelles, je peux utiliser",
+    "subject":"BDD",
+    "use":"Test de positionnement",
+    "correct":[
+      "ElasticSearch"
+    ],
+    "responses":[
+      "ElasticSearch",
+      "Neo4J",
+      "MySQL"
+    ],
+    "remark":null
+  },
+  {
+    "question":"A quoi faire attention lorsqu'on choisit un système de base de données ?",
+    "subject":"BDD",
+    "use":"Test de positionnement",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "La définition d'un schéma",
+      "La rapidité de lecture\/écriture",
+      "La différenciation des accés",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Quels sont les trois éléments constitutifs de Hadoop ?",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "HDFS, YARN et Haddoop MapReduce"
+    ],
+    "responses":[
+      "HDFS, YARN et Haddoop MapReduce",
+      "Hive, LOL et Spark",
+      "Spark, Hadoop MapReduce et Hive"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Lors de l'étape de Map d'un wordcount appliqué à la phrase \"cette phrase est une phrase\", les valeurs émises sont:",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "1, 1, 1, 1, 1, 1"
+    ],
+    "responses":[
+      "1, 2, 1, 1",
+      "1, 1, 1, 1, 1, 1",
+      "5, 0, 0, 0, 0"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans Hadoop, les combiners permettent",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "de limiter le nombre de valeurs émises lors de l'étape de Reduce"
+    ],
+    "responses":[
+      "de combiner les entrées et les sorties",
+      "de mieux distribuer la charge lors de la phase de Shuffle",
+      "de limiter le nombre de valeurs émises lors de l'étape de Reduce"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans Hadoop, les partitioners permettent",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "de mieux distribuer la charge lors de la phase de Shuffle"
+    ],
+    "responses":[
+      "de combiner les entrées et les sorties",
+      "de mieux distribuer la charge lors de la phase de Shuffle",
+      "de limiter le nombre de valeurs émises lors de l'étape de Reduce"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Le théorème CAP oppose",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "Disponibilité, Cohérence, Distribution"
+    ],
+    "responses":[
+      "Capacité, Vitesse, Distribution",
+      "Disponibilité, Cohérence, Distribution",
+      "Cohérence, Adaptabilité, Puissance"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Hive permet",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "d'abstraire une base de données relationnelle"
+    ],
+    "responses":[
+      "d'abstraire une base de données relationnelle",
+      "de classer les documents par ordre d'importance",
+      "d'orchestrer des clusters de machine"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Spark se différencie de Hadoop par",
+    "subject":"Systèmes distribués",
+    "use":"Test de positionnement",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "son absence de système de stockage",
+      "ses nombreuses librairies notamment de Machine Learning",
+      "l'écriture en mémoire plutôt que sur disque lors de la phase de Shuffle",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Un système de messagerie asynchrone permet de décorréler les consommateurs et les producteurs",
+    "subject":"Streaming de données",
+    "use":"Test de positionnement",
+    "correct":[
+      "Vrai"
+    ],
+    "responses":[
+      "Vrai",
+      "Faux"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Kafka est système de messagerie",
+    "subject":"Streaming de données",
+    "use":"Test de positionnement",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "distribué",
+      "asynchrone",
+      "publication\/abonnement",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"L'architecture lambda présente les couches",
+    "subject":"Streaming de données",
+    "use":"Test de positionnement",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "batch",
+      "temps réel",
+      "service",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Docker est utilisé",
+    "subject":"Docker",
+    "use":"Test de positionnement",
+    "correct":[
+      "pour développer rapidement et mettre en production facilement"
+    ],
+    "responses":[
+      "pour développer rapidement et mettre en production facilement",
+      "pour améliorer les capacités d'une base de données",
+      "pour améliorer la puissance de calcul"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Docker permet de persister des changements",
+    "subject":"Docker",
+    "use":"Test de positionnement",
+    "correct":[
+      "Oui à condition d'utiliser des volumes"
+    ],
+    "responses":[
+      "Oui",
+      "Non",
+      "Oui à condition d'utiliser des volumes"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Des containers Docker peuvent communiquer entre eux grâce à",
+    "subject":"Docker",
+    "use":"Test de positionnement",
+    "correct":[
+      "des networks"
+    ],
+    "responses":[
+      "des volumes",
+      "des networks",
+      "des communications "
+    ],
+    "remark":null
+  },
+  {
+    "question":"DockerHub est",
+    "subject":"Docker",
+    "use":"Test de positionnement",
+    "correct":[
+      "un répertoire d'images Docker"
+    ],
+    "responses":[
+      "un système qui permet de lancer plusieurs containers d'un coup",
+      "un système d'orchestration de containers",
+      "un répertoire d'images Docker"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Docker-compose est ",
+    "subject":"Docker",
+    "use":"Test de positionnement",
+    "correct":[
+      "un système qui permet de lancer plusieurs containers d'un coup"
+    ],
+    "responses":[
+      "un système qui permet de lancer plusieurs containers d'un coup",
+      "un système d'orchestration de containers",
+      "un répertoire d'images Docker"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Lequel de ces problème est un problème de classification:",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "Prédiction du caractère bénin d’une tumeur"
+    ],
+    "responses":[
+      "Segmentation clients",
+      "Calcul de prix optimal",
+      "Prédiction du caractère bénin d’une tumeur"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Est-ce que les algorithmes de classification permettent de donner une probabilité d’appartenance à une classe plutôt que simplement l’étiquette?",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "Oui, c’est en général la base de tous les algorithmes de classification"
+    ],
+    "responses":[
+      "Oui, c’est en général la base de tous les algorithmes de classification",
+      "Non, ce problème est un problème de régression"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Quelle métrique est utilisée en classification ?",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "Le F1-score"
+    ],
+    "responses":[
+      "Le F1-score",
+      "Le RMSE",
+      "La perplexité"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Quel algorithme est mieux adapté à un jeu de données majoritairement composé de variables qualitatives?",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "Arbre de décision"
+    ],
+    "responses":[
+      "SVM",
+      "Régression Logistique",
+      "Arbre de décision"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans un problème de fraude bancaire, la précision est-elle une métrique adaptée?\n",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "Non car le déséquilibre des deux classes ne permet pas une amélioration significative de cette métrique"
+    ],
+    "responses":[
+      "Oui puisque c’est un problème de classification.",
+      "Non car le déséquilibre des deux classes ne permet pas une amélioration significative de cette métrique"
+    ],
+    "remark":null
+  },
+  {
+    "question":"De donner une meilleure métrique dans toutes les situations",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "D’identifier facilement des proportions d’observations en fonction de leur probabilité"
+    ],
+    "responses":[
+      "De donner une meilleure métrique dans toutes les situations",
+      "D’être plus facilement interprétable ",
+      "D’identifier facilement des proportions d’observations en fonction de leur probabilité"
+    ],
+    "remark":null
+  },
+  {
+    "question":"La spécificité est définie par (V: vrai, F: faux, P: positif, N: négatif) : ",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "VN \/ (VN + FP)"
+    ],
+    "responses":[
+      "(VP + VN) \/ (VP + VN + FN + FP)",
+      "VN \/ (VN + FP)",
+      "VP \/ (VP + FN)"
+    ],
+    "remark":null
+  },
+  {
+    "question":"La sensibilité est définie par (V: vrai, F: faux, P: positif, N: négatif) : ",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "VP \/ (VP + FN)"
+    ],
+    "responses":[
+      "(VP + VN) \/ (VP + VN + FN + FP)",
+      "VN \/ (VN + FP)",
+      "VP \/ (VP + FN)"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Hadoop permet de: ",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "Stocker des données",
+      "Faire des calculs",
+      "Orchestrer des jobs MapReduce",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans le paradigme MapReduce, les combiners servent à: ",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Diminuer le nombre de valeurs à émettre des mappers aux reducers"
+    ],
+    "responses":[
+      "Équilibrer la charge de travail des reducers",
+      "Diminuer le nombre de valeurs à émettre des mappers aux reducers",
+      "Accélérer les calculs",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans le paradigme MapReduce, les partitioners servent à: ",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Équilibrer la charge de travail des reducers"
+    ],
+    "responses":[
+      "Équilibrer la charge de travail des reducers",
+      "Diminuer le nombre de valeurs à émettre des mappers aux reducers",
+      "Accélérer les calculs",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"L'utilisation de systèmes distrubués permet",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "D'accélérer les calculs ",
+      "De sécuriser l'accés aux données",
+      "D'augmenter facilement la capacité de stockage",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Hadoop streaming est un outil qui permet",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "De faire des jobs MapReduce avec n'importe quel langage de programmation"
+    ],
+    "responses":[
+      "De faire des jobs MapReduce avec n'importe quel langage de programmation",
+      "De faire du traitement de données en temps réel ",
+      "De stocker plusieurs copies d'un jeu de données",
+      "De stocker des vidéos sur un système distribué"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans le cas d'une architecture distribuée, le théorème CAP nous oblige à choisir entre:",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Cohérence et Disponibilité"
+    ],
+    "responses":[
+      "Cohérence et Disponibilité",
+      "Partition et Cohérence",
+      "Partition et Disponibilité"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Hive est ",
+    "subject":"Sytèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Une abstraction de SGDB relationnelles"
+    ],
+    "responses":[
+      "Un système de gestion de bases de données relationnelles",
+      "Une abstraction de SGDB relationnelles",
+      "Une librairie de Hadoop"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pour Hive, partitioner consiste à ",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Découper les tables selon les valeurs d'une variable"
+    ],
+    "responses":[
+      "Découper les tables en block de taille pré-définie",
+      "Découper les tables par colonnes",
+      "Découper les tables selon les valeurs d'une variable"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pig permet",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "De rendre l'écriture de jobs MapReduce plus simple et plus intuitive"
+    ],
+    "responses":[
+      "De rendre l'écriture de jobs MapReduce plus simple et plus intuitive",
+      "D'accélérer les calculs effectués sur Hadoop ",
+      "D'orchestrer Hive",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Sqoop est utilisé",
+    "subject":"Systèmes distribués",
+    "use":"Test de validation",
+    "correct":[
+      "Pour transférer des données depuis des SGDBR vers HDFS et inversement"
+    ],
+    "responses":[
+      "Pour transférer des données depuis des SGDBR vers HDFS et inversement",
+      "De faire des calculs en temps réel ",
+      "D'automatiser des jobs Map Reduce",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Data science is ...",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "A set of techniques and tools used to get value out of data."
+    ],
+    "responses":[
+      "A set of techniques and tools used to get value out of data.",
+      "A scientific approach of data acquisition.",
+      "A set of empirical approachs used to define theoretical formulas and \/or equations thanks to data."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Its applications are ...",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Limited to a small amount of fields and use cases."
+    ],
+    "responses":[
+      "Limited to a small amount of fields and use cases.",
+      "Close to unlimited and find use cases in almost every known fields where data can be collected."
+    ],
+    "remark":null
+  },
+  {
+    "question":"What are the first things you want to do when you start a Data Science project ?",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Define the problem.",
+      "Obtain the data and check if it fits our standard."
+    ],
+    "responses":[
+      "Define the problem.",
+      "Choose the model you want to implement.",
+      "Obtain the data and check if it fits our standard.",
+      "Ask Paul what to do next."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Are every datasets worth a Data Science project ?",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "No."
+    ],
+    "responses":[
+      "No.",
+      "If it's big enough, yes.",
+      "Yes."
+    ],
+    "remark":null
+  },
+  {
+    "question":"When the dataset is all set and obtained, what do you need to do ?",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Explore it and do a series of statistical tests on it.",
+      "Pre-process it by cleaning it of missing values or irrelevant data."
+    ],
+    "responses":[
+      "Run a model on it and then  do a series of statistical tests on it.",
+      "Explore it and do a series of statistical tests on it.",
+      "Pre-process it by cleaning it of missing values or irrelevant data."
+    ],
+    "remark":null
+  },
+  {
+    "question":"What are the best tools you can use when starting a project?",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Data Visualization.",
+      "Statistical tests.",
+      "Expert intuitions. ",
+      "Correlation matrix "
+    ],
+    "responses":[
+      "Data Visualization.",
+      "Statistical tests.",
+      "Expert intuitions. ",
+      "Correlation matrix "
+    ],
+    "remark":"Gut feelings. "
+  },
+  {
+    "question":"When building a model, you have to",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Train it on all the data available."
+    ],
+    "responses":[
+      "Look out for parameters that can be optimized and optimze them.",
+      "Train it on all the data available."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Your model is all done and working, what's next?",
+    "subject":"Data Science",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Analyze the results and tune the existing model to fit best the problem defined initially."
+    ],
+    "responses":[
+      "My project is done ! ",
+      "Analyze the results and tune the existing model to fit best the problem defined initially."
+    ],
+    "remark":null
+  },
+  {
+    "question":"What is Machine learning ?",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "An application of artificial intelligence that provides systems the ability to automatically learn and improve from experience without being explicitly programmed."
+    ],
+    "responses":[
+      "The phenomenon in which an algorithm realizes it is not paid enough and puts itself on a strike.",
+      "An application of artificial intelligence that provides systems the ability to automatically learn and improve from experience without being explicitly programmed.",
+      "Exactly what Datascientest offers : a way to learn through machines.",
+      "When an algorithm is programmed to adapt itself to a given situation."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Supervised learning ...",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Is when the data we use to fit the model on is labeled.",
+      "Allows to predict the value or the class of a new element."
+    ],
+    "responses":[
+      "Is when the data we use to fit the model on is labeled.",
+      "Is when the algorithm includes steps to check the progression of the computation process.",
+      "Allows to predict the value or the class of a new element.",
+      "Allows data partitioning according to the features,distribution density estimation and dimension reduction."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Unsupervised learning ...",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Is when the data we feed to our model is not labeled.",
+      "Allows data partitioning according to the features,distribution density estimation and dimension reduction."
+    ],
+    "responses":[
+      "Is when the data we feed to our model is not labeled.",
+      "Allows to predict the value or the class of a new element.",
+      "Allows data partitioning according to the features,distribution density estimation and dimension reduction."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Classification",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Is used when the target we aim to work on is discrete."
+    ],
+    "responses":[
+      "Is used when the target we aim to predict is continuous.",
+      "Is used when the target we aim to work on is discrete.",
+      "Is not a method needing artificial intelligence techniques."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Regression",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Is used when the target we aim to predict is continuous."
+    ],
+    "responses":[
+      "Is used when the target we aim to predict is continuous.",
+      "Is used when the target we aim to predict is discrete.",
+      "Gives the same results with two points or a thousand."
+    ],
+    "remark":null
+  },
+  {
+    "question":"Overfitting is",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "When the model fits too much the training data and don’t generalize enough."
+    ],
+    "responses":[
+      "When the model fits too much the training data and don’t generalize enough.",
+      "When the model takes too much time to train on the data.",
+      "When the algorithm can't store anymore the results of the fitting process."
+    ],
+    "remark":null
+  },
+  {
+    "question":"A way to handle imbalanced datasets is",
+    "subject":"Machine Learning",
+    "use":"Total Bootcamp",
+    "correct":[
+      "Under sampling",
+      "Over sampling"
+    ],
+    "responses":[
+      "Filtering",
+      "Under sampling",
+      "Over sampling"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pourquoi utiliser des APIs?",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "Pour isoler les services de l'utilisateur final",
+      "Pour normaliser les communications entre services",
+      "Pour permettre une évolution facile des services",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"En utilisant Flask, on permet à un utilisateur ou à une machine d'utiliser un service avec ",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "HTTP"
+    ],
+    "responses":[
+      "SQL",
+      "Python",
+      "HTTP",
+      "Java"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pourquoi utiliser Docker?",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "Pour déployer facilement et rapidement des processus",
+      "Pour isoler des processus de la machine hôte",
+      "Pour tester des services rapidement",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Si on fait un parallèle avec la programmation orientée objet, les images de containers Docker sont l'équivalent des",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "Classes"
+    ],
+    "responses":[
+      "Classes",
+      "Instances de classes",
+      "Méthodes",
+      "Objets"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pour faciliter le passage de fichiers entre la machine hôte et un container Docker, on peut utiliser les",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "Volumes"
+    ],
+    "responses":[
+      "Images",
+      "Networks",
+      "Volumes",
+      "Containers"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Pour faciliter la communication entre la machine hôte et un container Docker, on peut utiliser les",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "Networks"
+    ],
+    "responses":[
+      "Images",
+      "Networks",
+      "Volumes",
+      "Containers"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Quelle commande permet de lancer un container Docker ?",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "docker container run nom_de_l_image"
+    ],
+    "responses":[
+      "docker image run nom_de_l_image",
+      "docker container run nom_de_l_image",
+      "docker image pull nom_de_l_image",
+      "docker container pull nom_de_l_image"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Dans Airflow, le DAG répertorie",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "Tous ces points"
+    ],
+    "responses":[
+      "Les tâches à effectuer",
+      "Les actions à prendre en cas d'échecs",
+      "L'enchaînement des tâches à effectuer",
+      "Tous ces points"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Quelle est la différence entre le processing time et le event time ?",
+    "subject":"Streaming de données",
+    "use":"Test de validation",
+    "correct":[
+      "L’un correspond à l’entrée de la donnée dans le système alors que l’autre correspond à la date de création de la donnée"
+    ],
+    "responses":[
+      "L’un correspond au temps de début de calcul alors que l’autre correspond à la durée nécessaire pour le calcul",
+      "L’un correspond à l’entrée de la donnée dans le système alors que l’autre correspond à la date de création de la donnée",
+      "Ce sont en fait la même chose"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Kafka est un système de messagerie",
+    "subject":"Streaming de données",
+    "use":"Test de validation",
+    "correct":[
+      "Publication\/Abonnement + Asynchrone"
+    ],
+    "responses":[
+      "Publication\/Abonnement + Asynchrone",
+      "Publication\/Abonnement + Synchrone",
+      "Orienté queue + Asynchrone",
+      "Orienté queue+ Synchrone"
+    ],
+    "remark":null
+  },
+  {
+    "question":"Lequel de ces problème est un problème de classification",
+    "subject":"Classification",
+    "use":"Test de validation",
+    "correct":[
+      "Prédiction du caractère bénin d’une tumeur",
+      "Prédiction du départ d’un client",
+      "Reconnaissance d’objet",
+      "Génération automatique de mots"
+    ],
+    "responses":[
+      "Segmentation clients",
+      "Calcul de prix optimal",
+      "Prédiction du caractère bénin d’une tumeur",
+      "Estimation du prix d’une oeuvre d’art",
+      "Prédiction du départ d’un client",
+      "Modélisation des flux d’air autour d’un réacteur",
+      "Labellisation d’une image",
+      "Reconnaissance d’objet",
+      "Génération automatique de mots"
+    ],
+    "remark":null
+  },
+  {
+    "question":"A quoi sert Docker-Compose ?",
+    "subject":"Automation",
+    "use":"Test de validation",
+    "correct":[
+      "A répertorier les images publiques de containers",
+      "A déployer plusieurs containers en même temps"
+    ],
+    "responses":[
+      "A répertorier les images publiques de containers",
+      "A déployer plusieurs containers en même temps",
+      "A créer sa propre image Docker",
+      "Tous ces points",
+      "A répertorier les images publiques de containers",
+      "A déployer plusieurs containers en même temps",
+      "A créer sa propre image Docker",
+      "Tous ces points"
+    ],
+    "remark":null
+  }
+]
