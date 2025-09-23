@@ -206,5 +206,5 @@ Stockage : `data/users.db` (SQLite)
 - Licence : [MIT](LICENSE)  
 
 ### Auteurs
-- [Lucie](https://github.com/luciej0507)  
+- [Lucie Jouan](https://github.com/luciej0507)  
 - [Simon Brouard](https://github.com/TheBretonDuke)  
