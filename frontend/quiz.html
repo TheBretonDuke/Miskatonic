@@ -79,10 +79,23 @@
   let quizName = localStorage.getItem("misk_quiz_name") || ""; // conservé si quiz chargé depuis sessions existantes
   let quizTheme = localStorage.getItem("misk_quiz_theme") || "";
 
+  // Effet sonore discret (fanfare) – joué au lancement et à la fin du quiz
+  function playFanfare() {
+    const sfx = document.getElementById('sfx-fanfare');
+    if (!sfx) return;
+    try {
+      sfx.currentTime = 0;
+      sfx.volume = 0.6;
+      sfx.play().catch(() => {});
+    } catch (_) {}
+  }
+
     // Charger les questions
     async function startQuiz(limit = 5) {
       try {
           questions = [];
+          // Joue une courte fanfare au lancement du quiz
+          playFanfare();
           // Essayer d'utiliser la série mémorisée par questions.html
           const cached = localStorage.getItem("misk_quiz_set");
           if (cached) {
@@ -230,6 +243,8 @@
 
     // Afficher le score final
     function showResults() {
+      // Joue la fanfare à la fin du quiz
+      playFanfare();
       document.getElementById("quiz-body").innerHTML = `
         <div class="text-center">
           <h4>Quiz terminé 🎉</h4>
@@ -290,6 +305,8 @@
     document.getElementById("select-limit").value = String([5,10].includes(savedLimit) ? savedLimit : 5);
     startQuiz(savedLimit);
   </script>
+  <!-- Effet sonore: fanfare courte (aucun fichier JS séparé) -->
+  <audio id="sfx-fanfare" src="assets/fanfare.mp3" preload="auto"></audio>
   <!-- Background music (tiny inline script for autoplay policies) -->
   <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
   <script>
