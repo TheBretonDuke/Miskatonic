@@ -1,1 +1,0 @@
-db.createUser({ user: "quiz", pwd: "quiz", roles: [{ role: 'root', db: "admin" }] })
