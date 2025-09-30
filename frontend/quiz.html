@@ -5,12 +5,12 @@
   <title>Miskatonic Quiz - Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Google Fonts + style global -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Bootstrap -->
+  <!-- Bootstrap first -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Then custom theme to override Bootstrap -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Barre de navigation -->
@@ -18,6 +18,7 @@
     <div class="container d-flex justify-content-between">
       <span class="brand">Miskatonic Quiz</span>
       <div>
+        <a id="nav-admin" href="admin.html" class="btn btn-secondary btn-sm me-2 d-none">Admin</a>
         <span id="welcome-user" class="me-3 small-muted"></span>
         <button id="btn-logout" class="btn btn-danger btn-sm">Déconnexion</button>
       </div>
@@ -31,7 +32,16 @@
         <!-- Carte Quiz -->
         <div class="card">
           <h2 id="quiz-title">Quiz en cours</h2>
-          <div id="quiz-body"></div>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <label for="select-limit" class="form-label m-0">Nombre de questions:</label>
+            <select id="select-limit" class="form-select" style="width:auto">
+              <option value="5">5</option>
+              <option value="10">10</option>
+            </select>
+            <button id="btn-reload" class="btn btn-outline-secondary btn-sm">Relancer aléatoire</button>
+            <button id="btn-delete-quiz" class="btn btn-outline-danger btn-sm">Supprimer ce quiz</button>
+          </div>
+          <div id="quiz-body"><div class="p-3 small-muted">Chargement…</div></div>
         </div>
       </div>
     </div>
@@ -39,7 +49,7 @@
 
   <!-- JS -->
   <script>
-    const API_BASE = "http://127.0.0.1:8000";
+  const API_BASE = "http://127.0.0.1:8000";
 
     // Vérifier connexion utilisateur + rôle
     const user = localStorage.getItem("misk_user");
@@ -49,6 +59,9 @@
       window.location.href = "index.html";
     } else {
       document.getElementById("welcome-user").innerText = `Connecté : ${user} [${role}]`;
+      if (["prof", "admin"].includes(role)) {
+        document.getElementById("nav-admin").classList.remove("d-none");
+      }
     }
 
     // Déconnexion
@@ -59,16 +72,59 @@
     });
 
     // Variables du quiz
-    let questions = [];
+  let questions = [];
     let index = 0;
     let score = 0;
+  let quizId = localStorage.getItem("misk_quiz_id") || null;
+  let quizName = localStorage.getItem("misk_quiz_name") || "";
+  let quizTheme = localStorage.getItem("misk_quiz_theme") || "";
 
     // Charger les questions
     async function startQuiz(limit = 5) {
       try {
-        const res = await fetch(`${API_BASE}/questions?limit=${limit}`);
-        if (!res.ok) throw new Error("Erreur API");
-        questions = await res.json();
+          questions = [];
+          // Essayer d'utiliser la série mémorisée par questions.html
+          const cached = localStorage.getItem("misk_quiz_set");
+          if (cached) {
+            try {
+              const arr = JSON.parse(cached);
+              if (Array.isArray(arr) && arr.length === Number(limit)) {
+                questions = arr;
+              }
+            } catch (_) {
+              // cache invalide, on l'ignore
+            }
+          }
+
+          // Si un quiz_id serveur existe, il est prioritaire pour recharger exactement la même session serveur
+          if ((!Array.isArray(questions) || questions.length !== Number(limit)) && quizId) {
+            try {
+              const r = await fetch(`${API_BASE}/quiz/${quizId}`);
+              if (r.ok) {
+                const doc = await r.json();
+                if (Array.isArray(doc.questions) && doc.questions.length === Number(limit)) {
+                  questions = doc.questions;
+                }
+                if (doc.theme) {
+                  quizTheme = doc.theme;
+                  localStorage.setItem("misk_quiz_theme", quizTheme);
+                }
+              }
+            } catch (_) { /* ignore */ }
+          }
+
+          // Si pas de cache valide, on tire une nouvelle série et on la mémorise
+          if (!Array.isArray(questions) || questions.length !== Number(limit)) {
+            const url = new URL(`${API_BASE}/questions`);
+            url.searchParams.set('limit', String(limit));
+            if (quizTheme) url.searchParams.set('theme', quizTheme);
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Erreur API");
+            questions = await res.json();
+            localStorage.setItem("misk_quiz_set", JSON.stringify(questions));
+            localStorage.setItem("misk_quiz_limit", String(limit));
+          }
+
         if (questions.length === 0) {
           document.getElementById("quiz-body").innerHTML =
             `<div class="alert alert-warning">Aucune question disponible.</div>`;
@@ -76,6 +132,14 @@
         }
         index = 0;
         score = 0;
+        const titleEl = document.getElementById("quiz-title");
+        if (titleEl) {
+          const base = "Quiz en cours";
+          let txt = base;
+          if (quizName) txt += ` – ${quizName}`;
+          if (quizTheme) txt += ` · ${quizTheme}`;
+          titleEl.textContent = txt;
+        }
         showQuestion();
       } catch (err) {
         console.error(err);
@@ -118,6 +182,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             username: user,
+            quiz_id: quizId,
             question: q.question,
             reponse: selected
           })
@@ -175,11 +240,55 @@
           </div>
         </div>
       `;
-      document.getElementById("btn-retry").addEventListener("click", () => startQuiz(5));
+      document.getElementById("btn-retry").addEventListener("click", () => {
+        const limit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
+        // Nouvelle série au rejouer
+        localStorage.removeItem("misk_quiz_set");
+        startQuiz(limit);
+      });
     }
 
-    // Lancer au démarrage
-    startQuiz();
+    // Bouton relancer
+    document.getElementById("btn-reload").addEventListener("click", () => {
+      const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
+        // Forcer une nouvelle série: vider le cache avant de relancer
+        localStorage.removeItem("misk_quiz_set");
+        localStorage.removeItem("misk_quiz_id");
+        localStorage.removeItem("misk_quiz_name");
+        quizId = null;
+        quizName = "";
+      localStorage.setItem("misk_quiz_limit", String(limit));
+      startQuiz(limit);
+    });
+
+    // Supprimer ce quiz côté serveur
+    document.getElementById("btn-delete-quiz").addEventListener("click", async () => {
+      if (!quizId) {
+        alert("Aucun quiz à supprimer.");
+        return;
+      }
+      if (!confirm("Supprimer définitivement ce quiz ?")) return;
+      try {
+        const res = await fetch(`${API_BASE}/quiz/${encodeURIComponent(quizId)}?username=${encodeURIComponent(user)}`, { method: "DELETE" });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.detail || "Suppression impossible");
+        }
+        // Nettoyage local et retour
+        localStorage.removeItem("misk_quiz_set");
+        localStorage.removeItem("misk_quiz_id");
+        alert("Quiz supprimé.");
+        window.location.href = "questions.html";
+      } catch (err) {
+        alert(err.message || "Erreur de suppression");
+      }
+    });
+      // Note: le bouton #btn-retry n'existe qu'après l'affichage des résultats et est bindé dans showResults()
+
+    // Lancer au démarrage avec la limite sauvegardée ou 5
+  const savedLimit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
+    document.getElementById("select-limit").value = String([5,10].includes(savedLimit) ? savedLimit : 5);
+    startQuiz(savedLimit);
   </script>
 </body>
 </html>

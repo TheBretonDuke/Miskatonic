@@ -66,3 +66,15 @@ def authenticate_user(username: str, password: str) -> tuple[bool, str | None]:
     if verify_password(password, stored_password):
         return True, role
     return False, None
+
+# --- Rôle d'un utilisateur ---
+def get_user_role(username: str) -> str | None:
+    """Retourne le rôle de l'utilisateur (prof/admin/eleve) ou None si inconnu."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT role FROM users WHERE username=?", (username,))
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return None
+    return row[0]

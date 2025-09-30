@@ -5,12 +5,12 @@
   <title>Miskatonic Quiz - Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Google Fonts + style global -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Bootstrap -->
+  <!-- Bootstrap first -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Then custom theme to override Bootstrap -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Barre de navigation -->
@@ -18,6 +18,7 @@
     <div class="container d-flex justify-content-between">
       <span class="brand">Miskatonic Quiz</span>
       <div>
+        <a id="nav-admin" href="admin.html" class="btn btn-secondary btn-sm me-2 d-none">Admin</a>
         <span id="welcome-user" class="me-3 small-muted"></span>
         <button id="btn-logout" class="btn btn-danger btn-sm">Déconnexion</button>
       </div>
@@ -31,9 +32,24 @@
         <!-- Carte Questions -->
         <div class="card">
           <h2 class="mb-3">Questions disponibles</h2>
+          <div class="d-flex align-items-center gap-2 mb-3 flex-wrap controls-row">
+            <label for="select-limit" class="form-label m-0">Nombre de questions:</label>
+            <select id="select-limit" class="form-select" style="width:auto">
+              <option value="5">5</option>
+              <option value="10">10</option>
+            </select>
+            <select id="select-theme" class="form-select" style="width:auto">
+              <option value="">Tous les thèmes</option>
+            </select>
+            <label for="input-quiz-name" class="form-label m-0">Nom du quiz:</label>
+            <input id="input-quiz-name" class="form-control" style="min-width:220px; flex:1 1 260px; max-width:420px" placeholder="Nom du quiz (facultatif)">
+            <button id="btn-refresh" class="btn btn-outline-secondary btn-sm">Rafraîchir aléatoire</button>
+            <button id="btn-choose-quiz" class="btn btn-outline-primary btn-sm d-none">Choisir un quiz sauvegardé</button>
+            <button id="btn-save-quiz" class="btn btn-success btn-sm d-none">Sauvegarder ce quiz</button>
+          </div>
           <div id="questions-list" class="list-group"></div>
           <div class="d-grid mt-3">
-            <button id="btn-start-quiz" class="btn btn-primary">Lancer le quiz</button>
+            <button id="btn-start-quiz" class="btn btn-primary" disabled>Lancer le quiz</button>
           </div>
         </div>
       </div>
@@ -52,6 +68,12 @@
       window.location.href = "index.html";
     } else {
       document.getElementById("welcome-user").innerText = `Connecté : ${user} [${role}]`;
+      if (["prof", "admin"].includes(role)) {
+        document.getElementById("nav-admin").classList.remove("d-none");
+        document.getElementById("btn-choose-quiz").classList.remove("d-none");
+        const btnSave = document.getElementById("btn-save-quiz");
+        if (btnSave) btnSave.classList.remove("d-none");
+      }
     }
 
     // Déconnexion
@@ -64,9 +86,18 @@
     // Charger et afficher les questions
     async function loadQuestions(limit = 10) {
       try {
-        const res = await fetch(`${API_BASE}/questions?limit=${limit}`);
+        const theme = document.getElementById('select-theme').value || '';
+        const url = new URL(`${API_BASE}/questions`);
+        url.searchParams.set('limit', String(limit));
+        if (theme) url.searchParams.set('theme', theme);
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
+
+        // Stocke l'échantillon exact pour le quiz
+        localStorage.setItem("misk_quiz_set", JSON.stringify(data));
+        localStorage.setItem("misk_quiz_limit", String(limit));
+        localStorage.setItem("misk_quiz_theme", theme || "");
 
         const list = document.getElementById("questions-list");
         list.innerHTML = "";
@@ -82,6 +113,9 @@
           `;
           list.appendChild(item);
         });
+
+        // Autorise le lancement du quiz une fois la série prête
+        document.getElementById("btn-start-quiz").disabled = false;
       } catch (err) {
         console.error(err);
         document.getElementById("questions-list").innerHTML =
@@ -89,13 +123,215 @@
       }
     }
 
+    // S'assure que la série est prête en cache avant de partir sur le quiz
+    async function ensureQuizSet(limit) {
+      try {
+        const cached = localStorage.getItem("misk_quiz_set");
+        if (cached) {
+          try {
+            const arr = JSON.parse(cached);
+            if (Array.isArray(arr) && arr.length === Number(limit)) {
+              return; // déjà prêt côté client
+            }
+          } catch (_) { /* ignore */ }
+        }
+        // Sinon, charge maintenant
+        const theme = document.getElementById('select-theme').value || '';
+        const url = new URL(`${API_BASE}/questions`);
+        url.searchParams.set('limit', String(limit));
+        if (theme) url.searchParams.set('theme', theme);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Erreur API");
+        const data = await res.json();
+        localStorage.setItem("misk_quiz_set", JSON.stringify(data));
+        localStorage.setItem("misk_quiz_limit", String(limit));
+        localStorage.setItem("misk_quiz_theme", theme || "");
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    }
+
     // Bouton : démarrer quiz
-    document.getElementById("btn-start-quiz").addEventListener("click", () => {
-      window.location.href = "quiz.html";
+    document.getElementById("btn-start-quiz").addEventListener("click", async (ev) => {
+      const btn = ev.currentTarget;
+      btn.disabled = true;
+      const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
+      try {
+        localStorage.setItem("misk_quiz_limit", String(limit));
+        await ensureQuizSet(limit);
+        // Crée aussi une session côté serveur et conserve quiz_id
+        if (!["prof", "admin"].includes(role)) {
+          alert("Seuls les profs ou admins peuvent créer un quiz.");
+        } else {
+          const name = (document.getElementById('input-quiz-name').value || '').trim() || null;
+          const theme = document.getElementById('select-theme').value || null;
+          const res = await fetch(`${API_BASE}/quiz/create`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username: user, limit, name, theme })
+          });
+          if (res.ok) {
+            const body = await res.json();
+            localStorage.setItem("misk_quiz_id", body.quiz_id);
+            if (body.name) localStorage.setItem("misk_quiz_name", body.name);
+            if (body.theme) localStorage.setItem("misk_quiz_theme", body.theme);
+          } else {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || "Création de session serveur échouée");
+          }
+        }
+        window.location.href = "quiz.html";
+      } catch (_) {
+        alert("Impossible de préparer le quiz.");
+      } finally {
+        btn.disabled = false;
+      }
     });
 
+    // Changer la limite et recharger
+    document.getElementById("btn-refresh").addEventListener("click", () => {
+      const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
+      loadQuestions(limit);
+    });
+
+    // Rafraîchir automatiquement quand on change 5/10
+    document.getElementById("select-limit").addEventListener("change", (e) => {
+      const limit = parseInt(e.target.value, 10) || 5;
+      loadQuestions(limit);
+    });
+
+    document.getElementById('select-theme').addEventListener('change', () => {
+      const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
+      loadQuestions(limit);
+    });
+
+    // Sauvegarder le quiz sans le lancer (profs/admins)
+    const btnSaveQuiz = document.getElementById('btn-save-quiz');
+    if (btnSaveQuiz) {
+      btnSaveQuiz.addEventListener('click', async (ev) => {
+        if (!['prof','admin'].includes(role)) {
+          alert('Seuls les profs/admin peuvent sauvegarder un quiz.');
+          return;
+        }
+        const btn = ev.currentTarget;
+        btn.disabled = true;
+        try {
+          const limit = parseInt(document.getElementById('select-limit').value, 10) || 5;
+          const name = (document.getElementById('input-quiz-name').value || '').trim() || null;
+          const theme = document.getElementById('select-theme').value || null;
+          // Crée une session côté serveur (qui renverra la série sauvegardée)
+          const res = await fetch(`${API_BASE}/quiz/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, limit, name, theme })
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(()=>({}));
+            throw new Error(err.detail || 'Impossible de sauvegarder');
+          }
+          const body = await res.json();
+          // Mémorise et synchronise l'UI avec la série réellement sauvegardée
+          localStorage.setItem('misk_quiz_id', body.quiz_id);
+          localStorage.setItem('misk_quiz_limit', String(body.limit || limit));
+          if (body.name) localStorage.setItem('misk_quiz_name', body.name);
+          if (body.theme) localStorage.setItem('misk_quiz_theme', body.theme);
+          if (Array.isArray(body.questions)) {
+            localStorage.setItem('misk_quiz_set', JSON.stringify(body.questions));
+            // Rafraîchir l'aperçu pour correspondre exactement au quiz sauvegardé
+            const list = document.getElementById('questions-list');
+            list.innerHTML = '';
+            body.questions.forEach((q) => {
+              const item = document.createElement('div');
+              item.className = 'list-group-item';
+              item.innerHTML = `
+                <h6>${q.question}</h6>
+                <p class="small-muted">Thème : ${q.theme} | Niveau : ${q.niveau}</p>
+                <ul class="list-group">
+                  ${q.choix.map(c => `<li class=\"list-group-item\">🫧 ${c}</li>`).join("")}
+                </ul>
+              `;
+              list.appendChild(item);
+            });
+          }
+          // Confirmation simple
+          alert('Quiz sauvegardé avec succès.');
+        } catch (err) {
+          console.error(err);
+          alert(err.message || 'Erreur lors de la sauvegarde');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    }
+
     // Charger au démarrage
-    loadQuestions();
+    // Initialise la sélection avec valeur précédente si dispo
+    const savedLimit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
+    document.getElementById("select-limit").value = String([5,10].includes(savedLimit) ? savedLimit : 5);
+    loadQuestions(savedLimit);
+
+    // Charger la liste des thèmes
+    (async function loadThemes() {
+      try {
+        const res = await fetch(`${API_BASE}/themes`);
+        if (!res.ok) return;
+        const themes = await res.json();
+        const sel = document.getElementById('select-theme');
+        themes.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          sel.appendChild(opt);
+        });
+        // Pré-sélection si déjà choisie précédemment
+        const savedTheme = localStorage.getItem('misk_quiz_theme') || '';
+        if (savedTheme && themes.includes(savedTheme)) {
+          sel.value = savedTheme;
+          loadQuestions(savedLimit);
+        }
+      } catch (_) {}
+    })();
+
+    // --- Sélecteur de quiz sauvegardés ---
+    async function openSavedQuizPicker() {
+      try {
+        const scope = (role === 'admin') ? 'all' : undefined;
+        const url = new URL(`${API_BASE}/quiz`);
+        url.searchParams.set('username', user);
+        if (scope) url.searchParams.set('scope', scope);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Erreur API');
+        const items = await res.json();
+        if (!Array.isArray(items) || items.length === 0) {
+          alert('Aucun quiz sauvegardé.');
+          return;
+        }
+
+        // Petite modale simple en JS natif
+  const choices = items.map((it, i) => `${i+1}. ${it.name ? '“'+it.name+'” ' : ''}[${it.limit}]${it.theme ? ' · '+it.theme : ''} ${it.user} - ${new Date(it.created_at||'').toLocaleString()}\n   ${it.preview}`).join('\n\n');
+        const pick = prompt(`Sélectionnez un numéro de quiz:\n\n${choices}\n\nEntrez un numéro (1-${items.length}):`);
+        const idx = parseInt(pick || '', 10) - 1;
+        if (!(idx >=0 && idx < items.length)) return;
+        const chosen = items[idx];
+        // Charger la session choisie et pousser dans le cache local pour le quiz
+        const detail = await fetch(`${API_BASE}/quiz/${encodeURIComponent(chosen.quiz_id)}`);
+        if (!detail.ok) throw new Error('Lecture du quiz impossible');
+        const doc = await detail.json();
+        localStorage.setItem('misk_quiz_id', doc.quiz_id);
+  localStorage.setItem('misk_quiz_limit', String(doc.limit||doc.questions?.length||5));
+  if (doc.name) localStorage.setItem('misk_quiz_name', doc.name);
+  if (doc.theme) localStorage.setItem('misk_quiz_theme', doc.theme);
+        localStorage.setItem('misk_quiz_set', JSON.stringify(doc.questions||[]));
+        window.location.href = 'quiz.html';
+      } catch (err) {
+        console.error(err);
+        alert(err.message || 'Impossible de lister les quiz');
+      }
+    }
+
+    const btnChoose = document.getElementById('btn-choose-quiz');
+    if (btnChoose) btnChoose.addEventListener('click', openSavedQuizPicker);
   </script>
 </body>
 </html>

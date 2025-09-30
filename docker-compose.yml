@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb_quiz
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: quiz
+      MONGO_INITDB_ROOT_PASSWORD: quiz
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongodb:/data/db
+    restart: unless-stopped
