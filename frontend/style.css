@@ -18,9 +18,9 @@
 /* Fond général */
 body {
   font-family: 'EB Garamond', 'MedievalSharp', cursive, serif;
-  background:
-    linear-gradient(180deg, rgba(35,22,12,0.08), rgba(35,22,12,0.08)),
-    url("https://www.transparenttextures.com/patterns/aged-paper.png") repeat;
+  /* Full-page animated background GIF (single image) */
+  background: url('assets/bg.gif') center center / cover no-repeat fixed;
+  /* Fallback color while the GIF loads */
   background-color: var(--bg-parchment);
   color: var(--ink);
   margin: 0;
@@ -35,7 +35,8 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120% 80% at 50% 10%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.12) 100%);
+  /* Subtle vignette to keep UI readable over the GIF */
+  background: radial-gradient(120% 80% at 50% 10%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.18) 100%);
   z-index: -1;
 }
 
@@ -65,7 +66,7 @@ body::before {
 
 /* Cartes */
 .card {
-  background: #fdf6e3;
+  background: rgba(253, 246, 227, 0.92);
   border: 2px solid var(--gold);
   border-radius: 14px;
   padding: 20px;
@@ -244,7 +245,7 @@ textarea:focus {
 
 /* Listes de questions (aperçu) */
 .list-group-item {
-  background: linear-gradient(180deg, #fffdf7, #f6efd8);
+  background: linear-gradient(180deg, rgba(255,253,247,0.95), rgba(246,239,216,0.95));
   border: 1px solid #d7c7a2;
   border-radius: 8px !important;
   margin-bottom: 8px;

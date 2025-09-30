@@ -76,7 +76,7 @@
     let index = 0;
     let score = 0;
   let quizId = localStorage.getItem("misk_quiz_id") || null;
-  let quizName = localStorage.getItem("misk_quiz_name") || "";
+  let quizName = localStorage.getItem("misk_quiz_name") || ""; // conservé si quiz chargé depuis sessions existantes
   let quizTheme = localStorage.getItem("misk_quiz_theme") || "";
 
     // Charger les questions
@@ -136,7 +136,7 @@
         if (titleEl) {
           const base = "Quiz en cours";
           let txt = base;
-          if (quizName) txt += ` – ${quizName}`;
+          if (quizName) txt += ` – ${quizName}`; // optionnel si session nommée
           if (quizTheme) txt += ` · ${quizTheme}`;
           titleEl.textContent = txt;
         }
@@ -289,6 +289,56 @@
   const savedLimit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
     document.getElementById("select-limit").value = String([5,10].includes(savedLimit) ? savedLimit : 5);
     startQuiz(savedLimit);
+  </script>
+  <!-- Background music (tiny inline script for autoplay policies) -->
+  <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
+  <script>
+    (function(){
+      const audio = document.getElementById('bgm');
+      if (!audio) return;
+      const KEY_START = 'misk_bgm_start_ms';
+      const KEY_VOL = 'misk_bgm_vol';
+      const now = Date.now();
+      if (!localStorage.getItem(KEY_START)) {
+        localStorage.setItem(KEY_START, String(now));
+      }
+      const startMs = parseInt(localStorage.getItem(KEY_START) || String(now), 10) || now;
+      const vol = parseFloat(localStorage.getItem(KEY_VOL) || '0.25');
+
+      function setOffset() {
+        const dur = audio.duration;
+        if (isFinite(dur) && dur > 0) {
+          const elapsed = (Date.now() - startMs) / 1000;
+          audio.currentTime = (elapsed % dur);
+        }
+      }
+
+      function resume() {
+        audio.muted = false;
+        audio.volume = vol;
+        setOffset();
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            document.removeEventListener('pointerdown', resume);
+            document.removeEventListener('keydown', resume);
+          }).catch(() => {});
+        } else {
+          document.removeEventListener('pointerdown', resume);
+          document.removeEventListener('keydown', resume);
+        }
+      }
+
+      audio.addEventListener('loadedmetadata', setOffset);
+      audio.volume = vol;
+      setOffset();
+      audio.play().catch(() => {});
+      document.addEventListener('pointerdown', resume, { once: true });
+      document.addEventListener('keydown', resume, { once: true });
+      audio.addEventListener('volumechange', () => {
+        localStorage.setItem(KEY_VOL, String(audio.volume));
+      });
+    })();
   </script>
 </body>
 </html>

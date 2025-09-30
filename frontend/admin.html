@@ -199,5 +199,55 @@
       loadAll();
     }
   </script>
+  <!-- Background music (tiny inline script for autoplay policies) -->
+  <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
+  <script>
+    (function(){
+      const audio = document.getElementById('bgm');
+      if (!audio) return;
+      const KEY_START = 'misk_bgm_start_ms';
+      const KEY_VOL = 'misk_bgm_vol';
+      const now = Date.now();
+      if (!localStorage.getItem(KEY_START)) {
+        localStorage.setItem(KEY_START, String(now));
+      }
+      const startMs = parseInt(localStorage.getItem(KEY_START) || String(now), 10) || now;
+      const vol = parseFloat(localStorage.getItem(KEY_VOL) || '0.25');
+
+      function setOffset() {
+        const dur = audio.duration;
+        if (isFinite(dur) && dur > 0) {
+          const elapsed = (Date.now() - startMs) / 1000;
+          audio.currentTime = (elapsed % dur);
+        }
+      }
+
+      function resume() {
+        audio.muted = false;
+        audio.volume = vol;
+        setOffset();
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            document.removeEventListener('pointerdown', resume);
+            document.removeEventListener('keydown', resume);
+          }).catch(() => {});
+        } else {
+          document.removeEventListener('pointerdown', resume);
+          document.removeEventListener('keydown', resume);
+        }
+      }
+
+      audio.addEventListener('loadedmetadata', setOffset);
+      audio.volume = vol;
+      setOffset();
+      audio.play().catch(() => {});
+      document.addEventListener('pointerdown', resume, { once: true });
+      document.addEventListener('keydown', resume, { once: true });
+      audio.addEventListener('volumechange', () => {
+        localStorage.setItem(KEY_VOL, String(audio.volume));
+      });
+    })();
+  </script>
 </body>
 </html>

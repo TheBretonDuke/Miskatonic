@@ -15,6 +15,7 @@
 # ---------- IMPORTS ----------
 import pandas as pd
 import re
+from difflib import get_close_matches
 from pymongo import MongoClient
  
  
@@ -73,6 +74,29 @@ for _, row in df.iterrows():
 # On transforme la liste documents en df_clean
 df_clean = pd.DataFrame(documents)
  
+ 
+##### Gérer les thèmes mal orthographiés dans la colonne "subject"
+ 
+# On extrait tous les thèmes uniques non nuls
+sujets = df_clean["theme"].dropna().unique()
+# On prépare un dictionnaire vide pour stocker les corrections à appliquer
+corrections = {}
+ 
+for sujet in sujets:
+    # get_close_matches compare chaque sujet à tous les autres
+    # n=5 : on prend jusqu'à 5 suggestions
+    # cutoff=0.85 : seuil de similarité (plus c’est haut, plus c’est strict)
+    proches = get_close_matches(sujet, sujets, n=5, cutoff=0.85)
+    if len(proches) > 1:
+        # on compte combien de fois chaque variante apparaît dans le df_clean
+        freqs = df_clean[df_clean["theme"].isin(proches)]["theme"].value_counts()
+        # on choisit la variante la plus fréquente comme référence
+        sujet_ref = freqs.idxmax()
+        for variante in proches:
+            corrections[variante] = sujet_ref
+ 
+# on applique toutes les corrections au df_clean
+df_clean["theme"] = df_clean["theme"].replace(corrections)
  
 ##### Gérer plusieurs questions avec le même intutilé
  

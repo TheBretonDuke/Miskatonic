@@ -43,6 +43,7 @@ env/
 .venvquiz/
 venvquiz/
 .env
+.venvm/
 
 # Caches Python
 __pycache__/
