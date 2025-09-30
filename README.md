@@ -203,7 +203,8 @@ Stockage : `data/users.db` (SQLite)
 ---
 
 ## 📜 Licence & auteurs
-- Licence : [MIT](LICENSE)  
+- Licence : [MIT](LICENSE)
+- Background GIF chargé depuis Giphy uniquement pour démonstration pédagogique.
 
 ### Auteurs
 - [Lucie Jouan](https://github.com/luciej0507)  

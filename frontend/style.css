@@ -18,8 +18,8 @@
 /* Fond général */
 body {
   font-family: 'EB Garamond', 'MedievalSharp', cursive, serif;
-  /* Full-page animated background GIF (single image) */
-  background: url('assets/bg.gif') center center / cover no-repeat fixed;
+  /* Full-page animated background via external URL (Tenor) */
+  background: url('https://media1.tenor.com/m/4HZuHuRRkIsAAAAd/princess-mononoke-ashitaka.gif') center center / cover no-repeat fixed;
   /* Fallback color while the GIF loads */
   background-color: var(--bg-parchment);
   color: var(--ink);
