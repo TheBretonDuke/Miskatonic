@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <title>Miskatonic Quiz - Quiz</title>
@@ -12,6 +13,7 @@
   <!-- Then custom theme to override Bootstrap -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- Barre de navigation -->
   <nav class="navbar shadow-sm mb-4">
@@ -41,7 +43,9 @@
             <button id="btn-reload" class="btn btn-outline-secondary btn-sm">Relancer aléatoire</button>
             <button id="btn-delete-quiz" class="btn btn-outline-danger btn-sm">Supprimer ce quiz</button>
           </div>
-          <div id="quiz-body"><div class="p-3 small-muted">Chargement…</div></div>
+          <div id="quiz-body">
+            <div class="p-3 small-muted">Chargement…</div>
+          </div>
         </div>
       </div>
     </div>
@@ -49,7 +53,7 @@
 
   <!-- JS -->
   <script>
-  const API_BASE = "http://127.0.0.1:8000";
+    const API_BASE = "http://127.0.0.1:8000";
 
     // Vérifier connexion utilisateur + rôle
     const user = localStorage.getItem("misk_user");
@@ -72,71 +76,71 @@
     });
 
     // Variables du quiz
-  let questions = [];
+    let questions = [];
     let index = 0;
     let score = 0;
-  let quizId = localStorage.getItem("misk_quiz_id") || null;
-  let quizName = localStorage.getItem("misk_quiz_name") || ""; // conservé si quiz chargé depuis sessions existantes
-  let quizTheme = localStorage.getItem("misk_quiz_theme") || "";
+    let quizId = localStorage.getItem("misk_quiz_id") || null;
+    let quizName = localStorage.getItem("misk_quiz_name") || ""; // conservé si quiz chargé depuis sessions existantes
+    let quizTheme = localStorage.getItem("misk_quiz_theme") || "";
 
-  // Effet sonore discret (fanfare) – joué au lancement et à la fin du quiz
-  function playFanfare() {
-    const sfx = document.getElementById('sfx-fanfare');
-    if (!sfx) return;
-    try {
-      sfx.currentTime = 0;
-      sfx.volume = 0.6;
-      sfx.play().catch(() => {});
-    } catch (_) {}
-  }
+    // Effet sonore discret (fanfare) – joué au lancement et à la fin du quiz
+    function playFanfare() {
+      const sfx = document.getElementById('sfx-fanfare');
+      if (!sfx) return;
+      try {
+        sfx.currentTime = 0;
+        sfx.volume = 0.6;
+        sfx.play().catch(() => { });
+      } catch (_) { }
+    }
 
     // Charger les questions
     async function startQuiz(limit = 5) {
       try {
-          questions = [];
-          // Joue une courte fanfare au lancement du quiz
-          playFanfare();
-          // Essayer d'utiliser la série mémorisée par questions.html
-          const cached = localStorage.getItem("misk_quiz_set");
-          if (cached) {
-            try {
-              const arr = JSON.parse(cached);
-              if (Array.isArray(arr) && arr.length === Number(limit)) {
-                questions = arr;
-              }
-            } catch (_) {
-              // cache invalide, on l'ignore
+        questions = [];
+        // Joue une courte fanfare au lancement du quiz
+        playFanfare();
+        // Essayer d'utiliser la série mémorisée par questions.html
+        const cached = localStorage.getItem("misk_quiz_set");
+        if (cached) {
+          try {
+            const arr = JSON.parse(cached);
+            if (Array.isArray(arr) && arr.length === Number(limit)) {
+              questions = arr;
             }
+          } catch (_) {
+            // cache invalide, on l'ignore
           }
+        }
 
-          // Si un quiz_id serveur existe, il est prioritaire pour recharger exactement la même session serveur
-          if ((!Array.isArray(questions) || questions.length !== Number(limit)) && quizId) {
-            try {
-              const r = await fetch(`${API_BASE}/quiz/${quizId}`);
-              if (r.ok) {
-                const doc = await r.json();
-                if (Array.isArray(doc.questions) && doc.questions.length === Number(limit)) {
-                  questions = doc.questions;
-                }
-                if (doc.theme) {
-                  quizTheme = doc.theme;
-                  localStorage.setItem("misk_quiz_theme", quizTheme);
-                }
+        // Si un quiz_id serveur existe, il est prioritaire pour recharger exactement la même session serveur
+        if ((!Array.isArray(questions) || questions.length !== Number(limit)) && quizId) {
+          try {
+            const r = await fetch(`${API_BASE}/quiz/${quizId}`);
+            if (r.ok) {
+              const doc = await r.json();
+              if (Array.isArray(doc.questions) && doc.questions.length === Number(limit)) {
+                questions = doc.questions;
               }
-            } catch (_) { /* ignore */ }
-          }
+              if (doc.theme) {
+                quizTheme = doc.theme;
+                localStorage.setItem("misk_quiz_theme", quizTheme);
+              }
+            }
+          } catch (_) { /* ignore */ }
+        }
 
-          // Si pas de cache valide, on tire une nouvelle série et on la mémorise
-          if (!Array.isArray(questions) || questions.length !== Number(limit)) {
-            const url = new URL(`${API_BASE}/questions`);
-            url.searchParams.set('limit', String(limit));
-            if (quizTheme) url.searchParams.set('theme', quizTheme);
-            const res = await fetch(url);
-            if (!res.ok) throw new Error("Erreur API");
-            questions = await res.json();
-            localStorage.setItem("misk_quiz_set", JSON.stringify(questions));
-            localStorage.setItem("misk_quiz_limit", String(limit));
-          }
+        // Si pas de cache valide, on tire une nouvelle série et on la mémorise
+        if (!Array.isArray(questions) || questions.length !== Number(limit)) {
+          const url = new URL(`${API_BASE}/questions`);
+          url.searchParams.set('limit', String(limit));
+          if (quizTheme) url.searchParams.set('theme', quizTheme);
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Erreur API");
+          questions = await res.json();
+          localStorage.setItem("misk_quiz_set", JSON.stringify(questions));
+          localStorage.setItem("misk_quiz_limit", String(limit));
+        }
 
         if (questions.length === 0) {
           document.getElementById("quiz-body").innerHTML =
@@ -166,7 +170,7 @@
       const q = questions[index];
       document.getElementById("quiz-body").innerHTML = `
         <h5>${q.question}</h5>
-        <p class="small-muted">Thème : ${q.theme} | Niveau : ${q.niveau}</p>
+        <p class="small-muted">Thème : ${q.theme} | Test : ${q.test}</p>
         <form id="quiz-form">
           ${q.choix.map((c, i) => `
             <div class="form-check">
@@ -266,12 +270,12 @@
     // Bouton relancer
     document.getElementById("btn-reload").addEventListener("click", () => {
       const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
-        // Forcer une nouvelle série: vider le cache avant de relancer
-        localStorage.removeItem("misk_quiz_set");
-        localStorage.removeItem("misk_quiz_id");
-        localStorage.removeItem("misk_quiz_name");
-        quizId = null;
-        quizName = "";
+      // Forcer une nouvelle série: vider le cache avant de relancer
+      localStorage.removeItem("misk_quiz_set");
+      localStorage.removeItem("misk_quiz_id");
+      localStorage.removeItem("misk_quiz_name");
+      quizId = null;
+      quizName = "";
       localStorage.setItem("misk_quiz_limit", String(limit));
       startQuiz(limit);
     });
@@ -298,11 +302,11 @@
         alert(err.message || "Erreur de suppression");
       }
     });
-      // Note: le bouton #btn-retry n'existe qu'après l'affichage des résultats et est bindé dans showResults()
+    // Note: le bouton #btn-retry n'existe qu'après l'affichage des résultats et est bindé dans showResults()
 
     // Lancer au démarrage avec la limite sauvegardée ou 5
-  const savedLimit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
-    document.getElementById("select-limit").value = String([5,10].includes(savedLimit) ? savedLimit : 5);
+    const savedLimit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
+    document.getElementById("select-limit").value = String([5, 10].includes(savedLimit) ? savedLimit : 5);
     startQuiz(savedLimit);
   </script>
   <!-- Effet sonore: fanfare courte (aucun fichier JS séparé) -->
@@ -310,7 +314,7 @@
   <!-- Background music (tiny inline script for autoplay policies) -->
   <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
   <script>
-    (function(){
+    (function () {
       const audio = document.getElementById('bgm');
       if (!audio) return;
       const KEY_START = 'misk_bgm_start_ms';
@@ -339,7 +343,7 @@
           p.then(() => {
             document.removeEventListener('pointerdown', resume);
             document.removeEventListener('keydown', resume);
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           document.removeEventListener('pointerdown', resume);
           document.removeEventListener('keydown', resume);
@@ -349,7 +353,7 @@
       audio.addEventListener('loadedmetadata', setOffset);
       audio.volume = vol;
       setOffset();
-      audio.play().catch(() => {});
+      audio.play().catch(() => { });
       document.addEventListener('pointerdown', resume, { once: true });
       document.addEventListener('keydown', resume, { once: true });
       audio.addEventListener('volumechange', () => {
@@ -358,4 +362,5 @@
     })();
   </script>
 </body>
+
 </html>

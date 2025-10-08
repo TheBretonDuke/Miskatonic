@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <title>Miskatonic Quiz - Admin Questions</title>
@@ -11,6 +12,15 @@
   <!-- Then custom theme to override Bootstrap -->
   <link rel="stylesheet" href="style.css">
 </head>
+
+<!-- Popup confirmation ajout question -->
+<div id="addPopup" class="popup-add">
+  <div class="popup-add-content">
+    <span class="close" id="closeAddPopup">&times;</span>
+    <p>Nouvelle question ajoutée !</p>
+  </div>
+</div>
+
 <body>
   <nav class="navbar shadow-sm mb-4">
     <div class="container d-flex justify-content-between">
@@ -42,18 +52,19 @@
               </div>
               <div class="mb-2">
                 <label class="form-label">Thème</label>
-                <input id="q-theme" class="form-control" placeholder="Général">
+                <input id="q-theme" class="form-control" placeholder="Thème">
               </div>
               <div class="mb-2">
-                <label class="form-label">Niveau</label>
-                <input id="q-niveau" class="form-control" placeholder="Facile">
+                <label class="form-label">Test</label>
+                <input id="q-test" class="form-control" placeholder="Test">
               </div>
               <div class="mb-2">
                 <label class="form-label">Choix (un par ligne)</label>
                 <textarea id="q-choix" class="form-control" rows="4" required></textarea>
               </div>
               <div class="mb-2">
-                <label class="form-label">Réponses correctes (une par ligne, doivent correspondre exactement à un choix)</label>
+                <label class="form-label">Réponses correctes (une par ligne, doivent correspondre exactement à un
+                  choix)</label>
                 <textarea id="q-correct" class="form-control" rows="3" required></textarea>
               </div>
               <div class="d-grid">
@@ -118,9 +129,9 @@
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <h6 class="mb-1">${q.question}</h6>
-                <p class="small-muted mb-1">Thème: ${q.theme} | Niveau: ${q.niveau}</p>
+                <p class="small-muted mb-1">Thème: ${q.theme} | Test: ${q.test}</p>
                 <ul class="list-group small">
-                  ${q.choix.map(c => `<li class='list-group-item'>🫧 ${c}</li>`).join("")}
+                  ${q.choix.map(c => `<li class='list-group-item'> ${c}</li>`).join("")}
                 </ul>
               </div>
               <div>
@@ -159,7 +170,7 @@
       e.preventDefault();
       const question = document.getElementById("q-text").value.trim();
       const theme = document.getElementById("q-theme").value.trim();
-      const niveau = document.getElementById("q-niveau").value.trim();
+      const test = document.getElementById("q-test").value.trim();
       const choix = document.getElementById("q-choix").value.split("\n").map(s => s.trim()).filter(Boolean);
       const correct = document.getElementById("q-correct").value.split("\n").map(s => s.trim()).filter(Boolean);
       if (!question || choix.length === 0 || correct.length === 0) {
@@ -179,7 +190,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             username: user,
-            question, theme, niveau,
+            question, theme, test,
             choix, correct
           })
         });
@@ -187,9 +198,10 @@
           const body = await res.json().catch(() => ({}));
           throw new Error(body.detail || "Ajout impossible");
         }
-  const form = document.getElementById("form-add");
-  if (form && typeof form.reset === "function") form.reset();
+        const form = document.getElementById("form-add");
+        if (form && typeof form.reset === "function") form.reset();
         await loadAll();
+        showAddPopup();
       } catch (err) {
         alert(err.message || "Erreur d'ajout");
       }
@@ -198,11 +210,28 @@
     if (guardRole()) {
       loadAll();
     }
+
+    // --- Popup confirmation ajout question ---
+    const addPopup = document.getElementById("addPopup");
+    const closeAddPopup = document.getElementById("closeAddPopup");
+
+    function showAddPopup() {
+      addPopup.style.display = "block";
+      setTimeout(() => { addPopup.style.display = "none"; }, 3000);
+    }
+
+    closeAddPopup.addEventListener("click", () => {
+      addPopup.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === addPopup) addPopup.style.display = "none";
+    });
   </script>
   <!-- Background music (tiny inline script for autoplay policies) -->
   <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
   <script>
-    (function(){
+    (function () {
       const audio = document.getElementById('bgm');
       if (!audio) return;
       const KEY_START = 'misk_bgm_start_ms';
@@ -231,7 +260,7 @@
           p.then(() => {
             document.removeEventListener('pointerdown', resume);
             document.removeEventListener('keydown', resume);
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           document.removeEventListener('pointerdown', resume);
           document.removeEventListener('keydown', resume);
@@ -241,7 +270,7 @@
       audio.addEventListener('loadedmetadata', setOffset);
       audio.volume = vol;
       setOffset();
-      audio.play().catch(() => {});
+      audio.play().catch(() => { });
       document.addEventListener('pointerdown', resume, { once: true });
       document.addEventListener('keydown', resume, { once: true });
       audio.addEventListener('volumechange', () => {
@@ -250,4 +279,5 @@
     })();
   </script>
 </body>
+
 </html>

@@ -51,8 +51,8 @@ def get_questions(limit: int = 5, theme: str | None = None):
     for doc in cursor:
         q = {
             "question": doc.get("question", ""),
-            "theme": doc.get("theme", "Général"),
-            "niveau": doc.get("niveau", "Facile"),
+            "theme": doc.get("theme"),
+            "test": doc.get("test"),
             "choix": doc.get("choix", []),
             "correct": doc.get("correct", []),
         }
@@ -132,9 +132,17 @@ def list_themes() -> list[str]:
         return sorted([v for v in vals if isinstance(v, str) and v.strip()])
     except Exception:
         return []
+    
+def list_tests() -> list[str]:
+    """Retourne la liste triée des tests existants."""
+    try:
+        vals = collection.distinct("test")
+        return sorted([v for v in vals if isinstance(v, str) and v.strip()])
+    except Exception:
+        return []
 
 def add_question(doc: dict) -> bool:
-    """Ajoute une question dans MongoDB. doc doit contenir question, theme, niveau, choix, correct."""
+    """Ajoute une question dans MongoDB. doc doit contenir question, theme, test, choix, correct."""
     required = {"question", "choix", "correct"}
     if not required.issubset(doc.keys()):
         return False
@@ -142,7 +150,7 @@ def add_question(doc: dict) -> bool:
         return False
     # Normaliser quelques champs
     doc.setdefault("theme", "Général")
-    doc.setdefault("niveau", "Facile")
+    doc.setdefault("test")
     try:
         collection.insert_one(doc)
         return True
