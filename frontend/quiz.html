@@ -41,7 +41,6 @@
               <option value="10">10</option>
             </select>
             <button id="btn-reload" class="btn btn-outline-secondary btn-sm">Relancer aléatoire</button>
-            <button id="btn-delete-quiz" class="btn btn-outline-danger btn-sm">Supprimer ce quiz</button>
           </div>
           <div id="quiz-body">
             <div class="p-3 small-muted">Chargement…</div>
@@ -280,28 +279,6 @@
       startQuiz(limit);
     });
 
-    // Supprimer ce quiz côté serveur
-    document.getElementById("btn-delete-quiz").addEventListener("click", async () => {
-      if (!quizId) {
-        alert("Aucun quiz à supprimer.");
-        return;
-      }
-      if (!confirm("Supprimer définitivement ce quiz ?")) return;
-      try {
-        const res = await fetch(`${API_BASE}/quiz/${encodeURIComponent(quizId)}?username=${encodeURIComponent(user)}`, { method: "DELETE" });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.detail || "Suppression impossible");
-        }
-        // Nettoyage local et retour
-        localStorage.removeItem("misk_quiz_set");
-        localStorage.removeItem("misk_quiz_id");
-        alert("Quiz supprimé.");
-        window.location.href = "questions.html";
-      } catch (err) {
-        alert(err.message || "Erreur de suppression");
-      }
-    });
     // Note: le bouton #btn-retry n'existe qu'après l'affichage des résultats et est bindé dans showResults()
 
     // Lancer au démarrage avec la limite sauvegardée ou 5

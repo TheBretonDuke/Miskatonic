@@ -1,33 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8">
-  <title>Miskatonic Quiz - Admin Questions</title>
+  <title>Miskatonic Quiz - Administration</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-  <!-- Bootstrap first -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Then custom theme to override Bootstrap -->
   <link rel="stylesheet" href="style.css">
 </head>
 
-<!-- Popup confirmation ajout question -->
-<div id="addPopup" class="popup-add">
-  <div class="popup-add-content">
-    <span class="close" id="closeAddPopup">&times;</span>
-    <p>Nouvelle question ajoutée !</p>
-  </div>
-</div>
-
 <body>
+  <!-- Popup confirmation -->
+  <div id="addPopup" class="popup-add" style="display:none">
+    <div class="popup-add-content">
+      <span class="close" id="closeAddPopup">&times;</span>
+      <p>Nouvelle question ajoutée !</p>
+    </div>
+  </div>
+
   <nav class="navbar shadow-sm mb-4">
     <div class="container d-flex justify-content-between">
       <span class="brand">Miskatonic Quiz</span>
       <div>
         <a href="questions.html" class="btn btn-secondary btn-sm me-2">Questions</a>
-        <a href="quiz.html" class="btn btn-secondary btn-sm me-2">Quiz</a>
+        <a href="quiz.html" class="btn btn-secondary btn-sm me-2">Retour au quiz</a>
         <span id="welcome-user" class="me-3 small-muted"></span>
         <button id="btn-logout" class="btn btn-danger btn-sm">Déconnexion</button>
       </div>
@@ -41,9 +37,12 @@
           <h2>Administration des questions</h2>
           <p class="small-muted">Réservé aux professeurs et administrateurs.</p>
 
-          <div id="role-guard" class="alert alert-danger d-none">Accès refusé. Rôle requis: prof ou admin.</div>
+          <div id="role-guard" class="alert alert-danger d-none">
+            Accès refusé. Rôle requis: prof ou admin.
+          </div>
 
           <div id="admin-body" class="d-none">
+            <!-- Formulaire d'ajout -->
             <form id="form-add" class="mb-4">
               <h5>Ajouter une question</h5>
               <div class="mb-2">
@@ -52,19 +51,18 @@
               </div>
               <div class="mb-2">
                 <label class="form-label">Thème</label>
-                <input id="q-theme" class="form-control" placeholder="Thème">
+                <input id="q-theme" class="form-control" placeholder="Général">
               </div>
               <div class="mb-2">
                 <label class="form-label">Test</label>
-                <input id="q-test" class="form-control" placeholder="Test">
+                <input id="q-test" class="form-control" placeholder="Quiz">
               </div>
               <div class="mb-2">
                 <label class="form-label">Choix (un par ligne)</label>
                 <textarea id="q-choix" class="form-control" rows="4" required></textarea>
               </div>
               <div class="mb-2">
-                <label class="form-label">Réponses correctes (une par ligne, doivent correspondre exactement à un
-                  choix)</label>
+                <label class="form-label">Réponses correctes (une par ligne)</label>
                 <textarea id="q-correct" class="form-control" rows="3" required></textarea>
               </div>
               <div class="d-grid">
@@ -72,8 +70,9 @@
               </div>
             </form>
 
-            <h5>Questions existantes</h5>
-            <div class="d-flex align-items-center gap-2 mb-2">
+            <!-- Liste des questions -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5>Questions existantes</h5>
               <button id="btn-refresh" class="btn btn-outline-secondary btn-sm">Rafraîchir</button>
             </div>
             <div id="list" class="list-group"></div>
@@ -88,158 +87,143 @@
     const user = localStorage.getItem("misk_user");
     const role = localStorage.getItem("misk_role");
 
+    // Vérification connexion et rôle
     if (!user || !role) {
       alert("Vous devez vous connecter.");
       window.location.href = "index.html";
-    } else {
-      document.getElementById("welcome-user").innerText = `Connecté : ${user} [${role}]`;
     }
 
+    document.getElementById("welcome-user").innerText = `Connecté : ${user} [${role}]`;
+
+    if (!["prof", "admin"].includes(role)) {
+      document.getElementById("role-guard").classList.remove("d-none");
+    } else {
+      document.getElementById("admin-body").classList.remove("d-none");
+      loadQuestions();
+    }
+
+    // Déconnexion
     document.getElementById("btn-logout").addEventListener("click", () => {
-      localStorage.removeItem("misk_user");
-      localStorage.removeItem("misk_role");
+      localStorage.clear();
       window.location.href = "index.html";
     });
 
-    function guardRole() {
-      if (!["prof", "admin"].includes(role)) {
-        document.getElementById("role-guard").classList.remove("d-none");
-        return false;
-      }
-      document.getElementById("admin-body").classList.remove("d-none");
-      return true;
-    }
-
-    async function loadAll() {
+    // ===== FONCTIONS PRINCIPALES =====
+    
+    async function loadQuestions() {
       const list = document.getElementById("list");
-      list.innerHTML = "<div class='p-3 small-muted'>Chargement…</div>";
+      list.innerHTML = "<div class='p-3 text-muted'>Chargement…</div>";
+      
       try {
-        const res = await fetch(`${API_BASE}/admin/questions?username=${encodeURIComponent(user)}`);
+        const res = await fetch(`${API_BASE}/questions?admin=true&username=${encodeURIComponent(user)}`);
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          list.innerHTML = "<div class='alert alert-info'>Aucune question pour le moment.</div>";
+        
+        list.innerHTML = "";
+        if (!data || data.length === 0) {
+          list.innerHTML = "<div class='alert alert-info'>Aucune question trouvée.</div>";
           return;
         }
-        list.innerHTML = "";
+        
         data.forEach(q => {
-          const el = document.createElement("div");
-          el.className = "list-group-item";
-          el.innerHTML = `
+          const item = document.createElement("div");
+          item.className = "list-group-item";
+          item.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
-              <div>
+              <div class="flex-grow-1">
                 <h6 class="mb-1">${q.question}</h6>
-                <p class="small-muted mb-1">Thème: ${q.theme} | Test: ${q.test}</p>
-                <ul class="list-group small">
-                  ${q.choix.map(c => `<li class='list-group-item'> ${c}</li>`).join("")}
-                </ul>
+                <p class="mb-1 small text-muted">Thème: ${q.theme} | Test: ${q.test}</p>
+                <div class="small">Choix: ${q.choix.join(", ")}</div>
+                <div class="small text-success">Correct: ${q.correct.join(", ")}</div>
               </div>
-              <div>
-                <button class="btn btn-outline-danger btn-sm" data-q="${encodeURIComponent(q.question)}">Supprimer</button>
-              </div>
-            </div>`;
-          list.appendChild(el);
-        });
-
-        // Bind delete buttons
-        list.querySelectorAll("button[data-q]").forEach(btn => {
-          btn.addEventListener("click", async () => {
-            const q = decodeURIComponent(btn.getAttribute("data-q"));
-            if (!confirm(`Supprimer la question:\n${q}`)) return;
-            try {
-              const res = await fetch(`${API_BASE}/admin/questions?username=${encodeURIComponent(user)}&question=${encodeURIComponent(q)}`, { method: "DELETE" });
-              if (!res.ok) {
-                const body = await res.json().catch(() => ({}));
-                throw new Error(body.detail || "Suppression impossible");
-              }
-              await loadAll();
-            } catch (err) {
-              alert(err.message || "Erreur de suppression");
-            }
-          });
+              <button class="btn btn-outline-danger btn-sm" onclick="deleteQuestion('${q.question.replace(/'/g, "\\'")}')">
+                Supprimer
+              </button>
+            </div>
+          `;
+          list.appendChild(item);
         });
       } catch (err) {
         console.error(err);
-        list.innerHTML = `<div class='alert alert-danger'>Impossible de charger la liste.</div>`;
+        list.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement.</div>';
       }
     }
 
-    document.getElementById("btn-refresh").addEventListener("click", loadAll);
+    async function deleteQuestion(questionText) {
+      if (!confirm("Supprimer cette question ?")) return;
+      
+      try {
+        const res = await fetch(`${API_BASE}/questions`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, question: questionText })
+        });
+        if (!res.ok) throw new Error("Erreur lors de la suppression");
+        loadQuestions();
+      } catch (err) {
+        console.error(err);
+        alert("Erreur: " + err.message);
+      }
+    }
 
+    // Ajout de question
     document.getElementById("form-add").addEventListener("submit", async (e) => {
       e.preventDefault();
+      
       const question = document.getElementById("q-text").value.trim();
-      const theme = document.getElementById("q-theme").value.trim();
-      const test = document.getElementById("q-test").value.trim();
-      const choix = document.getElementById("q-choix").value.split("\n").map(s => s.trim()).filter(Boolean);
-      const correct = document.getElementById("q-correct").value.split("\n").map(s => s.trim()).filter(Boolean);
-      if (!question || choix.length === 0 || correct.length === 0) {
-        alert("Veuillez renseigner la question, au moins un choix et une réponse correcte.");
+      const theme = document.getElementById("q-theme").value.trim() || "Général";
+      const test = document.getElementById("q-test").value.trim() || "Quiz";
+      const choixRaw = document.getElementById("q-choix").value.trim();
+      const correctRaw = document.getElementById("q-correct").value.trim();
+
+      if (!question || !choixRaw || !correctRaw) {
+        alert("Veuillez remplir tous les champs obligatoires.");
         return;
       }
-      // Validation simple: correct doit exister dans choix
-      for (const c of correct) {
-        if (!choix.includes(c)) {
-          alert(`La réponse correcte '${c}' ne correspond à aucun choix.`);
-          return;
-        }
-      }
+
+      const choix = choixRaw.split("\n").map(s => s.trim()).filter(s => s);
+      const correct = correctRaw.split("\n").map(s => s.trim()).filter(s => s);
+
       try {
-        const res = await fetch(`${API_BASE}/admin/questions`, {
+        const res = await fetch(`${API_BASE}/questions`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: user,
-            question, theme, test,
-            choix, correct
-          })
+          body: JSON.stringify({ username: user, question, theme, test, choix, correct })
         });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.detail || "Ajout impossible");
-        }
-        const form = document.getElementById("form-add");
-        if (form && typeof form.reset === "function") form.reset();
-        await loadAll();
-        showAddPopup();
+        
+        if (!res.ok) throw new Error("Erreur lors de l'ajout");
+        
+        document.getElementById("form-add").reset();
+        document.getElementById("addPopup").style.display = "block";
+        setTimeout(() => { document.getElementById("addPopup").style.display = "none"; }, 3000);
+        
+        loadQuestions();
       } catch (err) {
-        alert(err.message || "Erreur d'ajout");
+        console.error(err);
+        alert("Erreur: " + err.message);
       }
     });
 
-    if (guardRole()) {
-      loadAll();
-    }
-
-    // --- Popup confirmation ajout question ---
-    const addPopup = document.getElementById("addPopup");
-    const closeAddPopup = document.getElementById("closeAddPopup");
-
-    function showAddPopup() {
-      addPopup.style.display = "block";
-      setTimeout(() => { addPopup.style.display = "none"; }, 3000);
-    }
-
-    closeAddPopup.addEventListener("click", () => {
-      addPopup.style.display = "none";
-    });
-
-    window.addEventListener("click", (e) => {
-      if (e.target === addPopup) addPopup.style.display = "none";
+    // Event listeners
+    document.getElementById("btn-refresh").addEventListener("click", loadQuestions);
+    document.getElementById("closeAddPopup").addEventListener("click", () => {
+      document.getElementById("addPopup").style.display = "none";
     });
   </script>
-  <!-- Background music (tiny inline script for autoplay policies) -->
+  
+  <!-- Background music -->
   <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
   <script>
-    (function () {
-      const audio = document.getElementById('bgm');
-      if (!audio) return;
+    const audio = document.getElementById('bgm');
+    if (audio) {
       const KEY_START = 'misk_bgm_start_ms';
       const KEY_VOL = 'misk_bgm_vol';
       const now = Date.now();
+      
       if (!localStorage.getItem(KEY_START)) {
         localStorage.setItem(KEY_START, String(now));
       }
+      
       const startMs = parseInt(localStorage.getItem(KEY_START) || String(now), 10) || now;
       const vol = parseFloat(localStorage.getItem(KEY_VOL) || '0.25');
 
@@ -251,33 +235,14 @@
         }
       }
 
-      function resume() {
-        audio.muted = false;
-        audio.volume = vol;
-        setOffset();
-        const p = audio.play();
-        if (p && typeof p.then === 'function') {
-          p.then(() => {
-            document.removeEventListener('pointerdown', resume);
-            document.removeEventListener('keydown', resume);
-          }).catch(() => { });
-        } else {
-          document.removeEventListener('pointerdown', resume);
-          document.removeEventListener('keydown', resume);
-        }
-      }
-
-      audio.addEventListener('loadedmetadata', setOffset);
       audio.volume = vol;
-      setOffset();
-      audio.play().catch(() => { });
-      document.addEventListener('pointerdown', resume, { once: true });
-      document.addEventListener('keydown', resume, { once: true });
-      audio.addEventListener('volumechange', () => {
-        localStorage.setItem(KEY_VOL, String(audio.volume));
+      audio.addEventListener('loadedmetadata', setOffset);
+      audio.play().catch(() => {
+        document.addEventListener('click', () => {
+          audio.play().catch(() => {});
+        }, { once: true });
       });
-    })();
+    }
   </script>
 </body>
-
 </html>

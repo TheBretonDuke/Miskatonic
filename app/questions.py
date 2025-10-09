@@ -51,8 +51,8 @@ def get_questions(limit: int = 5, theme: str | None = None):
     for doc in cursor:
         q = {
             "question": doc.get("question", ""),
-            "theme": doc.get("theme"),
-            "test": doc.get("test"),
+            "theme": doc.get("theme") or "Général",
+            "test": doc.get("test") or "Quiz",
             "choix": doc.get("choix", []),
             "correct": doc.get("correct", []),
         }
@@ -150,7 +150,7 @@ def add_question(doc: dict) -> bool:
         return False
     # Normaliser quelques champs
     doc.setdefault("theme", "Général")
-    doc.setdefault("test")
+    doc.setdefault("test", "Quiz")
     try:
         collection.insert_one(doc)
         return True

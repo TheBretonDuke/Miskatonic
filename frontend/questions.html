@@ -322,6 +322,7 @@
     document.getElementById('select-test').addEventListener('change', async () => {
       const test = document.getElementById('select-test').value;
       const themeSelect = document.getElementById('select-theme');
+      const currentTheme = themeSelect.value; // Sauvegarder la sélection actuelle
 
       try {
         let themes = [];
@@ -352,6 +353,11 @@
           themeSelect.appendChild(opt);
         });
 
+        // Restaurer la sélection si elle est encore disponible
+        if (currentTheme && themes.includes(currentTheme)) {
+          themeSelect.value = currentTheme;
+        }
+
         // Recharge les questions
         const limit = parseInt(document.getElementById('select-limit').value, 10) || 5;
         loadQuestions(limit);
@@ -364,6 +370,7 @@
     document.getElementById('select-theme').addEventListener('change', async () => {
       const theme = document.getElementById('select-theme').value;
       const testSelect = document.getElementById('select-test');
+      const currentTest = testSelect.value; // Sauvegarder la sélection actuelle
 
       try {
         let tests = [];
@@ -393,6 +400,11 @@
           opt.textContent = t;
           testSelect.appendChild(opt);
         });
+
+        // Restaurer la sélection si elle est encore disponible
+        if (currentTest && tests.includes(currentTest)) {
+          testSelect.value = currentTest;
+        }
 
         // Recharge les questions
         const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
