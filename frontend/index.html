@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <title>Miskatonic Quiz - Connexion</title>
@@ -12,6 +13,7 @@
   <!-- Then custom theme to override Bootstrap -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- Barre de navigation -->
   <nav class="navbar shadow-sm mb-4">
@@ -37,6 +39,9 @@
               <input id="login-password" type="password" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+            <p class="mt-2 text-center">
+              <a href="#" id="openPrivacy">Politique de confidentialité</a>
+            </p>
           </form>
         </div>
 
@@ -79,7 +84,7 @@
       try {
         const res = await fetch(`${API_BASE}/login`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
         if (res.ok) {
@@ -108,7 +113,7 @@
       try {
         const res = await fetch(`${API_BASE}/register`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password, role })
         });
         if (res.ok) {
@@ -127,7 +132,7 @@
   <!-- Background music (tiny inline script for autoplay policies) -->
   <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
   <script>
-    (function(){
+    (function () {
       const audio = document.getElementById('bgm');
       if (!audio) return;
       const KEY_START = 'misk_bgm_start_ms';
@@ -156,7 +161,7 @@
           p.then(() => {
             document.removeEventListener('pointerdown', resume);
             document.removeEventListener('keydown', resume);
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           document.removeEventListener('pointerdown', resume);
           document.removeEventListener('keydown', resume);
@@ -166,7 +171,7 @@
       audio.addEventListener('loadedmetadata', setOffset);
       audio.volume = vol;
       setOffset();
-      audio.play().catch(() => {});
+      audio.play().catch(() => { });
       document.addEventListener('pointerdown', resume, { once: true });
       document.addEventListener('keydown', resume, { once: true });
       audio.addEventListener('volumechange', () => {
@@ -174,5 +179,53 @@
       });
     })();
   </script>
+  <!-- Popup Politique de confidentialité -->
+  <div id="privacyPopup" class="popup">
+    <div class="popup-content">
+      <span class="close" id="closePopup">&times;</span>
+      <h2>Politique de confidentialité</h2>
+      <p>
+        Ce site est est destiné à une utilisation interne et n’a pas vocation à être utilisé à des fins commerciales.
+      </p>
+      <p>
+        <strong>Données collectées :</strong> nom d’utilisateur et mot de passe.
+      </p>
+      <p>
+        <strong>Utilisation :</strong> ces données servent uniquement à permettre la connexion et la génération de quiz.
+      </p>
+      <p>
+        <strong>Sécurité :</strong> les mots de passe sont stockés de manière sécurisée (hachage).
+      </p>
+      <p>
+        <strong>Partage :</strong> aucune donnée n’est transmise à des tiers.
+      </p>
+      <p>
+        Vous pouvez demander la suppression de vos données à tout moment en contactant l’équipe du projet.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const openBtn = document.getElementById("openPrivacy");
+    const closeBtn = document.getElementById("closePopup");
+    const popup = document.getElementById("privacyPopup");
+
+    openBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      popup.style.display = "block";
+    });
+
+    closeBtn.addEventListener("click", function () {
+      popup.style.display = "none";
+    });
+
+    window.addEventListener("click", function (e) {
+      if (e.target === popup) {
+        popup.style.display = "none";
+      }
+    });
+  </script>
+
 </body>
+
 </html>

@@ -14,6 +14,7 @@ from app.questions import (
     delete_quiz_session,
     list_quiz_sessions,
     list_themes,
+    list_tests
 )
 
 # --- INITIALISATION ---
@@ -32,7 +33,7 @@ app.add_middleware(
 class Question(BaseModel):
     question: str
     theme: str
-    niveau: str
+    test: str
     choix: List[str]
     correct: List[str]
 
@@ -87,6 +88,7 @@ class QuizCreateIn(BaseModel):
     limit: int = 5
     name: str | None = None
     theme: str | None = None
+    test: str | None = None
 
 @app.post("/quiz/create")
 def quiz_create(body: QuizCreateIn):
@@ -140,12 +142,46 @@ def quiz_list(username: str, max_items: int = 50, scope: str | None = None):
 def themes_list():
     return list_themes()
 
+@app.get("/tests", response_model=List[str])
+def tests_list():
+    return list_tests()
+
+@app.get("/themes_by_test/{test_name}", response_model=List[str])
+def themes_by_test(test_name: str):
+    """Retourne la liste des thèmes qui ont des questions pour ce test."""
+    if not test_name:
+        return list_themes()  # fallback : tous les thèmes
+    try:
+        vals = collection.distinct("theme", {"test": test_name})
+        return sorted([v for v in vals if isinstance(v, str) and v.strip()])
+    except Exception:
+        return []
+    
+@app.get("/tests_by_theme/{theme}", response_model=List[str])
+def tests_by_theme(theme: str):
+    # Récupère seulement les tests présents pour ce thème
+    try:
+        vals = collection.distinct("test", {"theme": theme})
+        return sorted([v for v in vals if isinstance(v, str) and v.strip()])
+    except:
+        return []
+
+@app.get("/tests_by_theme/{theme}", response_model=List[str])
+def tests_by_theme(theme: str):
+    # Récupère seulement les tests présents pour ce thème
+    try:
+        vals = collection.distinct("test", {"theme": theme})
+        return sorted([v for v in vals if isinstance(v, str) and v.strip()])
+    except:
+        return []
+
+
 # --- ADMIN/PROF: Gestion des questions ---
 class QuestionIn(BaseModel):
     username: str  # utilisateur effectuant l'action
     question: str
     theme: str | None = None
-    niveau: str | None = None
+    test: str | None = None
     choix: List[str]
     correct: List[str]
 
@@ -163,8 +199,8 @@ def admin_list_questions(username: str):
     for doc in docs:
         out.append({
             "question": doc.get("question", ""),
-            "theme": doc.get("theme", "Général"),
-            "niveau": doc.get("niveau", "Facile"),
+            "theme": doc.get("theme", ""),
+            "test": doc.get("test", ""),
             "choix": doc.get("choix", []),
             "correct": doc.get("correct", []),
         })
@@ -175,8 +211,8 @@ def admin_add_question(q: QuestionIn):
     _assert_prof_or_admin(q.username)
     ok = add_question({
         "question": q.question,
-        "theme": q.theme or "Général",
-        "niveau": q.niveau or "Facile",
+        "theme": q.theme,
+        "test": q.test,
         "choix": q.choix,
         "correct": q.correct,
     })

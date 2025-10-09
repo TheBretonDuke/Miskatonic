@@ -62,8 +62,8 @@ for _, row in df.iterrows():
     # si valeur manquante = ça renvoie None
     document = {
         "question": row["question"],
-        "theme": row.get("subject", "Général"),
-        "niveau": "Facile",  # Par défaut, on peut ajuster selon vos besoins
+        "theme": row.get("subject", None),
+        "test": row.get("use", None),
         "choix": choix,
         "correct": bonnes_reponses
     }
@@ -139,8 +139,8 @@ for question in questions_a_fusionner:
     # on crée une nouvelle ligne
     new_row = {
         "question": question,
-        "theme": groupe.iloc[0].get("theme", "Général"),
-        "niveau": groupe.iloc[0].get("niveau", "Facile"),
+        "theme": groupe.iloc[0].get("theme"),
+        "test": groupe.iloc[0].get("test"),
         "choix": merged_choix,
         "correct": merged_correct
     }

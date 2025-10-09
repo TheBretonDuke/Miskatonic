@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <title>Miskatonic Quiz - Questions</title>
@@ -12,6 +13,7 @@
   <!-- Then custom theme to override Bootstrap -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- Barre de navigation -->
   <nav class="navbar shadow-sm mb-4">
@@ -41,9 +43,14 @@
             <select id="select-theme" class="form-select" style="width:auto">
               <option value="">Tous les thèmes</option>
             </select>
-            <input id="input-quiz-name" class="form-control" style="min-width:220px; flex:1 1 260px; max-width:420px" placeholder="Nom du quiz (facultatif)">
+            <select id="select-test" class="form-select" style="width:auto">
+              <option value="">Tous les tests</option>
+            </select>
+            <input id="input-quiz-name" class="form-control" style="min-width:220px; flex:1 1 260px; max-width:420px"
+              placeholder="Nom du quiz (facultatif)">
             <button id="btn-refresh" class="btn btn-outline-secondary btn-sm">Rafraîchir aléatoire</button>
-            <button id="btn-choose-quiz" class="btn btn-outline-primary btn-sm d-none">Choisir un quiz sauvegardé</button>
+            <button id="btn-choose-quiz" class="btn btn-outline-primary btn-sm d-none">Choisir un quiz
+              sauvegardé</button>
             <button id="btn-save-quiz" class="btn btn-success btn-sm d-none">Sauvegarder ce quiz</button>
           </div>
           <div id="questions-list" class="list-group"></div>
@@ -93,6 +100,7 @@
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
 
+
         // Stocke l'échantillon exact pour le quiz
         localStorage.setItem("misk_quiz_set", JSON.stringify(data));
         localStorage.setItem("misk_quiz_limit", String(limit));
@@ -105,9 +113,9 @@
           item.className = "list-group-item";
           item.innerHTML = `
             <h6>${q.question}</h6>
-            <p class="small-muted">Thème : ${q.theme} | Niveau : ${q.niveau}</p>
+            <p class="small-muted">Thème : ${q.theme} | Test : ${q.test}</p>
             <ul class="list-group">
-              ${q.choix.map(c => `<li class="list-group-item">🫧 ${c}</li>`).join("")}
+              ${q.choix.map(c => `<li class="list-group-item"> ${c}</li>`).join("")}
             </ul>
           `;
           list.appendChild(item);
@@ -166,8 +174,8 @@
           const name = (document.getElementById('input-quiz-name').value || '').trim() || null;
           const theme = document.getElementById('select-theme').value || null;
           const res = await fetch(`${API_BASE}/quiz/create`, {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user, limit, name, theme })
           });
           if (res.ok) {
@@ -209,7 +217,7 @@
     const btnSaveQuiz = document.getElementById('btn-save-quiz');
     if (btnSaveQuiz) {
       btnSaveQuiz.addEventListener('click', async (ev) => {
-        if (!['prof','admin'].includes(role)) {
+        if (!['prof', 'admin'].includes(role)) {
           alert('Seuls les profs/admin peuvent sauvegarder un quiz.');
           return;
         }
@@ -226,7 +234,7 @@
             body: JSON.stringify({ username: user, limit, name, theme })
           });
           if (!res.ok) {
-            const err = await res.json().catch(()=>({}));
+            const err = await res.json().catch(() => ({}));
             throw new Error(err.detail || 'Impossible de sauvegarder');
           }
           const body = await res.json();
@@ -245,9 +253,9 @@
               item.className = 'list-group-item';
               item.innerHTML = `
                 <h6>${q.question}</h6>
-                <p class="small-muted">Thème : ${q.theme} | Niveau : ${q.niveau}</p>
+                <p class="small-muted">Thème : ${q.theme} | Test : ${q.test}</p>
                 <ul class="list-group">
-                  ${q.choix.map(c => `<li class=\"list-group-item\">🫧 ${c}</li>`).join("")}
+                  ${q.choix.map(c => `<li class="list-group-item"> ${c}</li>`).join("")}
                 </ul>
               `;
               list.appendChild(item);
@@ -267,7 +275,7 @@
     // Charger au démarrage
     // Initialise la sélection avec valeur précédente si dispo
     const savedLimit = parseInt(localStorage.getItem("misk_quiz_limit") || "5", 10);
-    document.getElementById("select-limit").value = String([5,10].includes(savedLimit) ? savedLimit : 5);
+    document.getElementById("select-limit").value = String([5, 10].includes(savedLimit) ? savedLimit : 5);
     loadQuestions(savedLimit);
 
     // Charger la liste des thèmes
@@ -283,14 +291,117 @@
           opt.textContent = t;
           sel.appendChild(opt);
         });
+
+
         // Pré-sélection si déjà choisie précédemment
         const savedTheme = localStorage.getItem('misk_quiz_theme') || '';
         if (savedTheme && themes.includes(savedTheme)) {
           sel.value = savedTheme;
           loadQuestions(savedLimit);
         }
-      } catch (_) {}
+      } catch (_) { }
     })();
+
+    // Charger la liste des tests
+    (async function loadTests() {
+      try {
+        const res = await fetch(`${API_BASE}/tests`);
+        if (!res.ok) return;
+        const tests = await res.json();
+        const sel = document.getElementById('select-test');
+        tests.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          sel.appendChild(opt);
+        });
+      } catch (_) { }
+    })();
+
+    // Quand on change de test
+    document.getElementById('select-test').addEventListener('change', async () => {
+      const test = document.getElementById('select-test').value;
+      const themeSelect = document.getElementById('select-theme');
+
+      try {
+        let themes = [];
+
+        if (!test) {
+          // Si "Tous les tests", récupérer tous les thèmes
+          const res = await fetch(`${API_BASE}/themes`);
+          if (!res.ok) throw new Error("Erreur API thèmes");
+          themes = await res.json();
+        } else {
+          // Sinon, récupérer seulement les thèmes pour ce test
+          const res = await fetch(`${API_BASE}/themes_by_test/${encodeURIComponent(test)}`);
+          if (!res.ok) throw new Error("Erreur API thèmes");
+          themes = await res.json();
+        }
+
+        // Mettre à jour le select des thèmes
+        themeSelect.innerHTML = '';
+        const optAll = document.createElement('option');
+        optAll.value = '';
+        optAll.textContent = 'Tous les thèmes';
+        themeSelect.appendChild(optAll);
+
+        themes.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          themeSelect.appendChild(opt);
+        });
+
+        // Recharge les questions
+        const limit = parseInt(document.getElementById('select-limit').value, 10) || 5;
+        loadQuestions(limit);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // Quand on change de thème (filtrage croisé)
+    document.getElementById('select-theme').addEventListener('change', async () => {
+      const theme = document.getElementById('select-theme').value;
+      const testSelect = document.getElementById('select-test');
+
+      try {
+        let tests = [];
+
+        if (!theme) {
+          // Si "Tous les thèmes", récupérer tous les tests
+          const res = await fetch(`${API_BASE}/tests`);
+          if (!res.ok) throw new Error("Erreur API tests");
+          tests = await res.json();
+        } else {
+          // Sinon, récupérer seulement les tests pour ce thème
+          const res = await fetch(`${API_BASE}/tests_by_theme/${encodeURIComponent(theme)}`);
+          if (!res.ok) throw new Error("Erreur API tests");
+          tests = await res.json();
+        }
+
+        // Mettre à jour le select des tests
+        testSelect.innerHTML = '';
+        const optAll = document.createElement('option');
+        optAll.value = '';
+        optAll.textContent = 'Tous les tests';
+        testSelect.appendChild(optAll);
+
+        tests.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          testSelect.appendChild(opt);
+        });
+
+        // Recharge les questions
+        const limit = parseInt(document.getElementById("select-limit").value, 10) || 5;
+        loadQuestions(limit);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
 
     // --- Sélecteur de quiz sauvegardés ---
     async function openSavedQuizPicker() {
@@ -308,20 +419,20 @@
         }
 
         // Petite modale simple en JS natif
-  const choices = items.map((it, i) => `${i+1}. ${it.name ? '“'+it.name+'” ' : ''}[${it.limit}]${it.theme ? ' · '+it.theme : ''} ${it.user} - ${new Date(it.created_at||'').toLocaleString()}\n   ${it.preview}`).join('\n\n');
+        const choices = items.map((it, i) => `${i + 1}. ${it.name ? '“' + it.name + '” ' : ''}[${it.limit}]${it.theme ? ' · ' + it.theme : ''} ${it.user} - ${new Date(it.created_at || '').toLocaleString()}\n   ${it.preview}`).join('\n\n');
         const pick = prompt(`Sélectionnez un numéro de quiz:\n\n${choices}\n\nEntrez un numéro (1-${items.length}):`);
         const idx = parseInt(pick || '', 10) - 1;
-        if (!(idx >=0 && idx < items.length)) return;
+        if (!(idx >= 0 && idx < items.length)) return;
         const chosen = items[idx];
         // Charger la session choisie et pousser dans le cache local pour le quiz
         const detail = await fetch(`${API_BASE}/quiz/${encodeURIComponent(chosen.quiz_id)}`);
         if (!detail.ok) throw new Error('Lecture du quiz impossible');
         const doc = await detail.json();
         localStorage.setItem('misk_quiz_id', doc.quiz_id);
-  localStorage.setItem('misk_quiz_limit', String(doc.limit||doc.questions?.length||5));
-  if (doc.name) localStorage.setItem('misk_quiz_name', doc.name);
-  if (doc.theme) localStorage.setItem('misk_quiz_theme', doc.theme);
-        localStorage.setItem('misk_quiz_set', JSON.stringify(doc.questions||[]));
+        localStorage.setItem('misk_quiz_limit', String(doc.limit || doc.questions?.length || 5));
+        if (doc.name) localStorage.setItem('misk_quiz_name', doc.name);
+        if (doc.theme) localStorage.setItem('misk_quiz_theme', doc.theme);
+        localStorage.setItem('misk_quiz_set', JSON.stringify(doc.questions || []));
         window.location.href = 'quiz.html';
       } catch (err) {
         console.error(err);
@@ -335,7 +446,7 @@
   <!-- Background music (tiny inline script for autoplay policies) -->
   <audio id="bgm" src="assets/bg.mp3" preload="auto" loop hidden></audio>
   <script>
-    (function(){
+    (function () {
       const audio = document.getElementById('bgm');
       if (!audio) return;
       const KEY_START = 'misk_bgm_start_ms';
@@ -364,7 +475,7 @@
           p.then(() => {
             document.removeEventListener('pointerdown', resume);
             document.removeEventListener('keydown', resume);
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           document.removeEventListener('pointerdown', resume);
           document.removeEventListener('keydown', resume);
@@ -374,7 +485,7 @@
       audio.addEventListener('loadedmetadata', setOffset);
       audio.volume = vol;
       setOffset();
-      audio.play().catch(() => {});
+      audio.play().catch(() => { });
       document.addEventListener('pointerdown', resume, { once: true });
       document.addEventListener('keydown', resume, { once: true });
       audio.addEventListener('volumechange', () => {
@@ -383,4 +494,5 @@
     })();
   </script>
 </body>
+
 </html>
