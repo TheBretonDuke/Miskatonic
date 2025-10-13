@@ -137,14 +137,14 @@ Accès :
 ```http
 POST /register
 {
-  "username": "simon",
+  "username": "bob",
   "password": "monmotdepasse",
   "role": "eleve"
 }
 
 POST /login
 {
-  "username": "simon",
+  "username": "bob",
   "password": "monmotdepasse"
 }
 ```

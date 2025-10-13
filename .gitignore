@@ -74,3 +74,6 @@ output/
 # Node.js
 node_modules/
 dist/
+
+# Autres
+memo.txt
