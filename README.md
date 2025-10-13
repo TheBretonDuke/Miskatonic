@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow" />
 </p>
 
+
 <p align="center">
   <img src="https://img.shields.io/badge/Architecture-Modular-success" />
   <img src="https://img.shields.io/badge/Main.py-25%20lines-brightgreen" />
