@@ -249,8 +249,6 @@ POST /answer                     # Vérifier réponse
 
 Stockage : `data/users.db` (SQLite, auto-créé au premier `/register`)
 
-> **Note :** Le rôle par défaut est `prof` si non spécifié  
-
 ---
 
 ## ![Troubleshooting](https://img.shields.io/badge/Help-Troubleshooting-orange) Dépannage rapide
