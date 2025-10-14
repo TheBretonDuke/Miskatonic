@@ -1,65 +1,232 @@
 ===============================
-Mémo - Lancer le projet Quiz
+🧙‍♂️ MISKATONIC QUIZ - Guide Complet
 ===============================
 
---- MongoDB (Docker) ---
+=== 📖 DESCRIPTION DU PROJET ===
 
-# Lancer MongoDB dans un conteneur (si pas déjà créé)
+API de quiz universitaire avec architecture modulaire FastAPI + MongoDB + SQLite.
+Inspiré de la Miskatonic University (Lovecraft) avec interface médiévale.
+
+Structure refactorisée (Oct 2025) :
+- main.py : 474 → 25 lignes (-95%)
+- Architecture modulaire professionnelle
+- Séparation claire des responsabilités
+
+=== 🏗️ ARCHITECTURE ===
+
+📁 Structure du projet :
+```
+Miskatonic/
+├── app/                          # 🚀 API Backend
+│   ├── main.py                   # Point d'entrée (25 lignes)
+│   ├── config.py                 # Configuration FastAPI/CORS
+│   ├── models.py                 # Modèles Pydantic
+│   ├── utils.py                  # Fonctions utilitaires
+│   ├── database.py               # SQLite (utilisateurs)
+│   ├── questions.py              # Logique MongoDB (questions)
+│   └── routes/                   # 🛣️ Routes par domaine
+│       ├── auth_routes.py        # POST /login, /register
+│       ├── questions_routes.py   # GET/POST/DELETE /questions
+│       ├── quiz_routes.py        # /quiz/* (sessions)
+│       └── utilities_routes.py   # /themes, /tests, /answer
+├── data/                         # 💾 Bases de données
+│   ├── users.db                  # SQLite (auto-créé)
+│   ├── questions.csv             # Source CSV
+│   └── mongodb/                  # Données MongoDB (Docker)
+├── frontend/                     # 🎨 Interface HTML/CSS
+│   ├── index.html                # Page d'accueil
+│   ├── questions.html            # Gestion questions
+│   ├── quiz.html                 # Interface quiz
+│   └── style.css                 # Thème médiéval
+├── etl.py                        # 🔄 Import CSV → MongoDB
+├── requirements.txt              # 📦 Dépendances Python
+└── README.md                     # 📚 Documentation
+```
+
+=== 🛠️ STACK TECHNIQUE ===
+
+Backend :
+- FastAPI (API REST)
+- Uvicorn (serveur ASGI)
+- MongoDB (questions & quiz)
+- SQLite (utilisateurs)
+- Pydantic (validation)
+
+Frontend :
+- HTML5 + CSS3
+- Bootstrap + thème custom
+- JavaScript vanilla
+
+DevOps :
+- Docker (MongoDB)
+- Git (versioning)
+
+=== ⚙️ INSTALLATION ===
+
+# 1. Cloner le repo
+git clone https://github.com/TheBretonDuke/Miskatonic.git
+cd Miskatonic
+
+# 2. Environnement Python
+python -m venv .venvquiz
+source .venvquiz/bin/activate        # macOS/Linux
+# .venvquiz\Scripts\Activate.ps1    # Windows
+
+# 3. Dépendances
+pip install -r requirements.txt
+
+# 4. MongoDB (Docker)
 docker run -d \
   --name mongodb_quiz \
   -p 27017:27017 \
   -v ~/data/mongodb:/data/db \
   mongo:7
 
-# Vérifier si le conteneur tourne
-docker ps
+# 5. Import des questions
+python etl.py
 
-# Arrêter MongoDB
-docker stop mongodb_quiz
+=== 🚀 LANCEMENT ===
 
-# Relancer MongoDB
+# Démarrer MongoDB (si arrêté)
 docker start mongodb_quiz
 
-# Voir les logs (optionnel, debug)
-docker logs mongodb_quiz
-
-
---- Base de données utilisateurs (SQLite) ---
-
-# La base est dans :
-data/users.db
-
-# Si besoin, recréer la table
-# (c’est automatique via init_db() dans app/database.py)
-
-
---- API FastAPI (backend Python) ---
-
-# Activer l'environnement virtuel
+# Activer l'environnement
 source .venvquiz/bin/activate
 
-# Lancer le serveur (port 8000 par défaut)
-uvicorn app.main:app --reload
+# Lancer l'API (hot-reload)
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Tester dans le navigateur :
-http://127.0.0.1:8000/docs    (interface Swagger/OpenAPI)
-http://127.0.0.1:8000/questions?limit=5
+# URLs importantes :
+# 🌐 API : http://127.0.0.1:8000
+# 📖 Docs : http://127.0.0.1:8000/docs
+# 🧪 Test : http://127.0.0.1:8000/questions?limit=3
 
+=== 🔌 ENDPOINTS API ===
 
---- Frontend (HTML) ---
+🔐 Authentification :
+POST /register    # Créer compte
+POST /login       # Connexion
 
-# Fichiers statiques dans le dossier frontend/
-frontend/index.html
-frontend/questions.html
-frontend/quiz.html
+📝 Questions :
+GET /questions                     # Liste questions
+GET /questions?admin=true&username=prof1  # Mode admin
+POST /questions                    # Ajouter question (prof+)
+DELETE /questions                  # Supprimer question (prof+)
 
-# Ouvrir dans un navigateur (double-clic ou `open`)
-open frontend/questions.html
-open frontend/quiz.html
+🎯 Quiz :
+POST /quiz/create                 # Créer session (prof+)
+GET /quiz/{quiz_id}              # Récupérer quiz
+DELETE /quiz/{quiz_id}           # Supprimer quiz
+GET /quiz                        # Lister quiz (prof+)
 
---- Pour kill un port ---
-lsof -i :8000
+🛠️ Utilitaires :
+GET /themes                      # Liste thèmes
+GET /tests                       # Liste tests
+GET /themes_by_test/{test}       # Thèmes par test
+GET /tests_by_theme/{theme}      # Tests par thème
+POST /answer                     # Vérifier réponse
 
-kill -9 <PID>
-Relancer uvicorn avecuvicorn app.main:app --reload
+=== 👥 UTILISATEURS & RÔLES ===
 
+🧑‍🎓 etudiant : Passer des quiz uniquement
+👨‍🏫 prof     : Créer/gérer questions + quiz
+🛡️ admin    : Accès complet système
+
+Stockage : data/users.db (SQLite, auto-créé)
+
+=== 💾 BASES DE DONNÉES ===
+
+MongoDB (Questions) :
+- URI : mongodb://localhost:27017
+- Base : miskatonic_quiz
+- Collection : questions
+- Format : {question, theme, test, choix[], correct[]}
+
+SQLite (Utilisateurs) :
+- Fichier : data/users.db
+- Table : users (username, password_hash, role)
+- Création automatique via init_db()
+
+=== 🎨 FRONTEND ===
+
+Interface thématique Miskatonic :
+- frontend/index.html → Connexion/Inscription
+- frontend/questions.html → Gestion questions (prof)
+- frontend/quiz.html → Interface quiz
+- Thème CSS médiéval avec animations
+
+=== 🛠️ DÉVELOPPEMENT ===
+
+Architecture modulaire :
+- Modèles : app/models.py
+- Configuration : app/config.py
+- Routes par domaine : app/routes/
+- Logique métier : app/database.py, app/questions.py
+- Point d'entrée simple : app/main.py (25 lignes)
+
+Hot-reload automatique avec --reload
+
+=== 🚨 DÉPANNAGE ===
+
+MongoDB pas démarré :
+docker ps                        # Vérifier conteneurs
+docker start mongodb_quiz        # Redémarrer si besoin
+
+Aucune question :
+python etl.py                    # Réimporter CSV
+
+Port 8000 occupé :
+lsof -i :8000                    # Voir processus
+kill -9 <PID>                    # Tuer processus
+
+Erreur imports Python :
+source .venvquiz/bin/activate    # Réactiver venv
+pip install -r requirements.txt  # Réinstaller dépendances
+
+Base SQLite corrompue :
+rm data/users.db                 # Supprimer
+# Redémarrer l'API → recréation auto
+
+=== 📝 COMMANDES UTILES ===
+
+# Git
+git status
+git add .
+git commit -m "Description"
+git push origin main
+
+# Docker MongoDB
+docker ps                        # Conteneurs actifs
+docker logs mongodb_quiz         # Logs MongoDB
+docker exec -it mongodb_quiz mongosh  # Shell MongoDB
+
+# Python
+python etl.py                    # Import questions
+pip freeze > requirements.txt    # Sauver dépendances
+python -c "import app.main"      # Test imports
+
+# Tests API (curl)
+curl -X GET "http://127.0.0.1:8000/questions?limit=2"
+curl -X POST "http://127.0.0.1:8000/register" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"123","role":"etudiant"}'
+
+=== 🎯 PROCHAINES ÉTAPES ===
+
+Améliorations possibles :
+- Tests unitaires (pytest)
+- Authentification JWT
+- Rate limiting
+- Logging structuré
+- Déploiement Docker Compose
+- CI/CD GitHub Actions
+- Base de données cloud (MongoDB Atlas)
+
+=== 📞 SUPPORT ===
+
+Auteurs :
+- Simon Brouard (@TheBretonDuke)
+- Lucie Jouan (@luciej0507)
+
+Repo : https://github.com/TheBretonDuke/Miskatonic
+License : MIT
