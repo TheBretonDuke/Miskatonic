@@ -45,3 +45,31 @@ class AnswerInput(BaseModel):
     quiz_id: str | None = Field(None, description="ID de session de quiz", example="quiz_123456")
     question: str = Field(..., description="Question à laquelle on répond", example="Combien font 2+2 ?")
     reponse: List[str] = Field(..., description="Réponses sélectionnées", example=["4"])
+
+
+# --- Modèles pour la gestion des utilisateurs ---
+
+class UserInfo(BaseModel):
+    """Informations publiques d'un utilisateur"""
+    username: str = Field(..., description="Nom d'utilisateur", example="prof_martin")
+    role: str = Field(..., description="Rôle de l'utilisateur", example="prof")
+
+
+class UserRoleUpdate(BaseModel):
+    """Mise à jour du rôle d'un utilisateur"""
+    admin_username: str = Field(..., description="Nom d'utilisateur admin (pour vérification)", example="admin")
+    target_username: str = Field(..., description="Utilisateur à modifier", example="prof_martin") 
+    new_role: str = Field(..., description="Nouveau rôle", example="admin", pattern="^(etudiant|prof|admin)$")
+
+
+class PasswordUpdate(BaseModel):
+    """Mise à jour du mot de passe"""
+    username: str = Field(..., description="Nom d'utilisateur", example="prof_martin")
+    current_password: str = Field(..., description="Mot de passe actuel", example="ancien_mdp")
+    new_password: str = Field(..., description="Nouveau mot de passe", example="nouveau_mdp", min_length=6)
+
+
+class UserDeletion(BaseModel):
+    """Suppression d'un utilisateur"""
+    admin_username: str = Field(..., description="Nom d'utilisateur admin (pour vérification)", example="admin")
+    target_username: str = Field(..., description="Utilisateur à supprimer", example="prof_martin")

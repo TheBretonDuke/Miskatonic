@@ -78,3 +78,62 @@ def get_user_role(username: str) -> str | None:
     if not row:
         return None
     return row[0]
+
+
+# --- Gestion complète des utilisateurs ---
+def list_users() -> list[dict]:
+    """Retourne la liste de tous les utilisateurs (sans les mots de passe)."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT username, role FROM users ORDER BY username")
+    rows = cur.fetchall()
+    conn.close()
+    return [{"username": row[0], "role": row[1]} for row in rows]
+
+
+def delete_user(username: str) -> bool:
+    """Supprime un utilisateur. Retourne True si succès."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE username=?", (username,))
+    deleted = cur.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
+
+
+def update_user_role(username: str, new_role: str) -> bool:
+    """Met à jour le rôle d'un utilisateur. Retourne True si succès."""
+    if new_role not in ("etudiant", "prof", "admin"):
+        return False
+    
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET role=? WHERE username=?", (new_role, username))
+    updated = cur.rowcount > 0
+    conn.commit()
+    conn.close()
+    return updated
+
+
+def update_user_password(username: str, new_password: str) -> bool:
+    """Met à jour le mot de passe d'un utilisateur. Retourne True si succès."""
+    hashed = hash_password(new_password)
+    
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET password_hash=? WHERE username=?", (hashed, username))
+    updated = cur.rowcount > 0
+    conn.commit()
+    conn.close()
+    return updated
+
+
+def user_exists(username: str) -> bool:
+    """Vérifie si un utilisateur existe. Retourne True si il existe."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM users WHERE username=?", (username,))
+    exists = cur.fetchone() is not None
+    conn.close()
+    return exists

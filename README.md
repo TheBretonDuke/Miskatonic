@@ -185,6 +185,27 @@ POST /login                      # Se connecter
 }
 ```
 
+### ![Users](https://img.shields.io/badge/Users-Management-orange) Gestion des utilisateurs
+```http
+GET /users?admin_username=admin  # Lister tous les utilisateurs (admin)
+GET /users/{username}?requesting_user=admin  # Info utilisateur
+
+DELETE /users/{username}?admin_username=admin  # Supprimer (admin)
+PUT /users/{username}/role       # Modifier rôle (admin)
+{
+  "admin_username": "admin",
+  "target_username": "prof1", 
+  "new_role": "admin"
+}
+
+PUT /users/{username}/password   # Changer son mot de passe
+{
+  "username": "prof1",
+  "current_password": "ancien_mdp",
+  "new_password": "nouveau_mdp"
+}
+```
+
 ### ![Questions](https://img.shields.io/badge/Questions-CRUD-blue) Questions (CRUD)
 ```http
 GET /questions                   # Mode normal (échantillon aléatoire)
