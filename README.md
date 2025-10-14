@@ -9,14 +9,6 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow" />
 </p>
 
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Architecture-Modular-success" />
-  <img src="https://img.shields.io/badge/Main.py-25%20lines-brightgreen" />
-  <img src="https://img.shields.io/badge/Refactored-95%25%20reduction-orange" />
-  <img src="https://img.shields.io/badge/Hot--reload-Enabled-blue" />
-</p>
-
 ---
 
 Générateur de **quiz** avec **FastAPI**, **MongoDB** et **SQLite**.  
